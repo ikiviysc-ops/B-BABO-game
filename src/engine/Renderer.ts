@@ -96,7 +96,7 @@ export class Renderer {
     this.ctx.fillStyle = 'rgba(255,255,255,0.4)';
     this.ctx.font = `${10 * dpr}px monospace`;
     this.ctx.textAlign = 'right';
-    this.ctx.fillText(`${current}/${total}  [TAB]`, this._width - x, y + 18 * dpr);
+    this.ctx.fillText(`${current}/${total}  [TAB/点击切换]`, this._width - x, y + 18 * dpr);
     this.ctx.textAlign = 'left';
 
     this.ctx.restore();

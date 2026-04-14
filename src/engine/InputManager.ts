@@ -10,6 +10,7 @@ export class InputManager {
   private _touchActive = false;
   private _touchX = 0;
   private _touchY = 0;
+  private _tapFlag = false; // 单次点击标志（触摸切换角色用）
   private _canvas: HTMLCanvasElement;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -20,6 +21,15 @@ export class InputManager {
   /** 每帧调用，处理持续输入 */
   update(): void {
     // 预留：可在此处理输入缓冲、连发等
+  }
+
+  /** 消费一次 tap 事件（返回 true 后自动重置） */
+  consumeTap(): boolean {
+    if (this._tapFlag) {
+      this._tapFlag = false;
+      return true;
+    }
+    return false;
   }
 
   get keys(): ReadonlySet<string> { return this._keys; }
@@ -77,6 +87,7 @@ export class InputManager {
     this._canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
       this._touchActive = true;
+      this._tapFlag = true; // 标记一次 tap
       this.updateTouch(e);
     }, { passive: false });
     this._canvas.addEventListener('touchmove', (e) => {

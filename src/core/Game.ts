@@ -88,7 +88,7 @@ export class Game {
   private update(dt: number): void {
     this.input.update();
 
-    // Tab 键切换角色
+    // PC: Tab 键切换角色
     if (this.input.isKeyDown('tab') && !this._tabPressed) {
       this._tabPressed = true;
       this._charIndex = (this._charIndex + 1) % this._charIds.length;
@@ -96,6 +96,20 @@ export class Game {
     }
     if (!this.input.isKeyDown('tab')) {
       this._tabPressed = false;
+    }
+
+    // 手机: 触摸屏幕切换角色（点击画面上半区 = 下一个，下半区 = 上一个）
+    if (this.input.consumeTap()) {
+      const ty = this.input.touchY;
+      const th = this.canvas.clientHeight || window.innerHeight;
+      if (ty < th * 0.5) {
+        // 点击上半屏 → 下一个角色
+        this._charIndex = (this._charIndex + 1) % this._charIds.length;
+      } else {
+        // 点击下半屏 → 上一个角色
+        this._charIndex = (this._charIndex - 1 + this._charIds.length) % this._charIds.length;
+      }
+      this.spawnCharacter(this._charIds[this._charIndex]);
     }
 
     this.movementSystem.update(this.entities, dt);
