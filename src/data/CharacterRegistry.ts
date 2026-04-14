@@ -47,6 +47,34 @@ import { SPRITES_BATCH_1 } from '@data/sprites_batch1';
 import { SPRITES_BATCH_2 } from '@data/sprites_batch2';
 import { SPRITES_BATCH_3 } from '@data/sprites_batch3';
 import { SPRITES_BATCH_4 } from '@data/sprites_batch4';
+import { HIRONO_BASE_SPRITE } from '@entities/BaboSprite';
+
+/** 幻影角色专用调色板（深色+黑白Mime风格）*/
+const PHANTOM_PALETTE: Record<string, string> = {
+  hair:     '#1a1a20',
+  hairHi:   '#383840',
+  hairDk:   '#0a0a10',
+  skin:     '#e8e0d8',
+  skinSh:   '#c8c0b8',
+  blush:    '#d8a8a8',
+  nose:     '#c88080',
+  eyeW:     '#f0f0f0',
+  eyeI:     '#1a1a20',
+  eyeB:     '#0a0a10',
+  lid:      '#d8d0c8',
+  lidSh:    '#b8b0a8',
+  mouth:    '#a09090',
+  coat:     '#f0ece8',
+  coatHi:   '#ffffff',
+  coatDk:   '#d0ccc8',
+  coatLn:   '#b0aca8',
+  inner:    '#e0dcd8',
+  shoe:     '#1a1a20',
+  outline:  '#0a0a10',
+  white:    '#ffffff',
+  ghost:    '#c8c4c0',
+  wisp:     '#e8e4e0',
+};
 
 /** 全部 20 个角色精灵 */
 const ALL_SPRITES: CharacterSprite[] = [
@@ -54,13 +82,19 @@ const ALL_SPRITES: CharacterSprite[] = [
   ...SPRITES_BATCH_2,
   ...SPRITES_BATCH_3,
   ...SPRITES_BATCH_4,
-].map(s => ({
-  ...s,
-  // 确保 palette 中无 undefined 值
-  palette: Object.fromEntries(
-    Object.entries(s.palette).filter(([, v]) => v !== undefined),
-  ),
-}));
+].map(s => {
+  // 幻影角色：用基础HIRONO模板替换sprite（修复面部变形）
+  if (s.id === 'phantom') {
+    return { ...s, sprite: { ...HIRONO_BASE_SPRITE }, palette: PHANTOM_PALETTE };
+  }
+  return {
+    ...s,
+    // 确保 palette 中无 undefined 值
+    palette: Object.fromEntries(
+      Object.entries(s.palette).filter(([, v]) => v !== undefined),
+    ),
+  };
+});
 
 /** 精灵索引 (id → CharacterSprite) */
 const spriteIndex = new Map<string, CharacterSprite>();
