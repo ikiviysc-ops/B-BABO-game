@@ -1,5 +1,6 @@
 /**
- * 移动系统 - 处理玩家/实体移动
+ * 移动系统 - 处理玩家移动
+ * 只移动没有 enemyId 的实体（即玩家）
  */
 
 import { InputManager } from '@engine/InputManager';
@@ -13,6 +14,8 @@ export class MovementSystem {
     if (axis.x === 0 && axis.y === 0) return;
 
     for (const entity of entities.getAll()) {
+      // 只移动玩家（没有 enemyId 的实体）
+      if ('enemyId' in entity) continue;
       entity.x += axis.x * entity.speed * dt;
       entity.y += axis.y * entity.speed * dt;
     }

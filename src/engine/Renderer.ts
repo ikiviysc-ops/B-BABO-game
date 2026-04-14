@@ -101,4 +101,76 @@ export class Renderer {
 
     this.ctx.restore();
   }
+
+  /** 居中文字 */
+  renderCenterText(text: string): void {
+    this.ctx.save();
+    this.ctx.resetTransform();
+    const dpr = window.devicePixelRatio || 1;
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = `bold ${16 * dpr}px monospace`;
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(text, this._width / 2, this._height / 2);
+    this.ctx.textAlign = 'left';
+    this.ctx.restore();
+  }
+
+  /** 游戏 HUD */
+  renderGameHUD(
+    wave: number, score: number,
+    hp: number, maxHp: number,
+    xp: number, xpToNext: number, level: number,
+    kills: number,
+  ): void {
+    this.ctx.save();
+    this.ctx.resetTransform();
+    const dpr = window.devicePixelRatio || 1;
+    const x = 8 * dpr;
+
+    // 顶部背景条
+    this.ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    this.ctx.fillRect(0, 0, this._width, 60 * dpr);
+
+    // 波次 + 分数
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = `bold ${14 * dpr}px monospace`;
+    this.ctx.fillText(`Wave ${wave}`, x, 20 * dpr);
+
+    this.ctx.fillStyle = '#ffcc00';
+    this.ctx.font = `${12 * dpr}px monospace`;
+    this.ctx.fillText(`Score: ${score}  Kills: ${kills}`, x, 38 * dpr);
+
+    // 等级 + 经验条
+    this.ctx.fillStyle = '#88ccff';
+    this.ctx.fillText(`Lv.${level}`, x, 54 * dpr);
+
+    // 经验条
+    const barX = 60 * dpr;
+    const barW = 80 * dpr;
+    const barH = 8 * dpr;
+    const barY = 47 * dpr;
+    this.ctx.fillStyle = '#333';
+    this.ctx.fillRect(barX, barY, barW, barH);
+    this.ctx.fillStyle = '#44aaff';
+    this.ctx.fillRect(barX, barY, barW * Math.min(xp / xpToNext, 1), barH);
+
+    // 血条（右上角）
+    const hpBarW = 120 * dpr;
+    const hpBarH = 10 * dpr;
+    const hpX = this._width - hpBarW - x;
+    const hpY = 12 * dpr;
+    this.ctx.fillStyle = '#333';
+    this.ctx.fillRect(hpX, hpY, hpBarW, hpBarH);
+    const hpRatio = Math.max(hp / maxHp, 0);
+    this.ctx.fillStyle = hpRatio > 0.5 ? '#44cc44' : hpRatio > 0.25 ? '#ccaa22' : '#cc2222';
+    this.ctx.fillRect(hpX, hpY, hpBarW * hpRatio, hpBarH);
+    this.ctx.strokeStyle = '#666';
+    this.ctx.strokeRect(hpX, hpY, hpBarW, hpBarH);
+
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = `${10 * dpr}px monospace`;
+    this.ctx.fillText(`HP ${hp}/${maxHp}`, hpX, hpY + hpBarH + 14 * dpr);
+
+    this.ctx.restore();
+  }
 }

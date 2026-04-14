@@ -80,7 +80,13 @@ export class InputManager {
       this._mouseX = e.clientX - rect.left;
       this._mouseY = e.clientY - rect.top;
     });
-    this._canvas.addEventListener('mousedown', () => { this._mouseDown = true; });
+    this._canvas.addEventListener('mousedown', (e) => {
+      this._mouseDown = true;
+      this._tapFlag = true; // 鼠标点击也视为 tap
+      const rect = this._canvas.getBoundingClientRect();
+      this._touchX = e.clientX - rect.left;
+      this._touchY = e.clientY - rect.top;
+    });
     this._canvas.addEventListener('mouseup', () => { this._mouseDown = false; });
 
     // 触摸
