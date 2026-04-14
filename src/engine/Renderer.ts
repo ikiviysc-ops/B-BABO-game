@@ -56,12 +56,49 @@ export class Renderer {
 
   /** 渲染 HUD 层 (屏幕空间) */
   renderHUD(): void {
-    // 左上角 FPS / 调试信息
     this.ctx.save();
     this.ctx.resetTransform();
     this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
     this.ctx.font = '12px monospace';
-    this.ctx.fillText('B-BABO Survivors v0.1', 8, 20);
+    this.ctx.fillText('B-BABO Survivors v0.2', 8, 20);
+    this.ctx.restore();
+  }
+
+  /** 渲染角色信息 HUD */
+  renderCharacterHUD(
+    name: string,
+    series: string,
+    current: number,
+    total: number,
+  ): void {
+    this.ctx.save();
+    this.ctx.resetTransform();
+
+    const dpr = window.devicePixelRatio || 1;
+    const x = 8 * dpr;
+    const y = 20 * dpr;
+
+    // 半透明背景条
+    this.ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    this.ctx.fillRect(0, 0, this._width, 50 * dpr);
+
+    // 角色名
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = `bold ${14 * dpr}px monospace`;
+    this.ctx.fillText(name, x, y + 18 * dpr);
+
+    // HIRONO 系列
+    this.ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    this.ctx.font = `${10 * dpr}px monospace`;
+    this.ctx.fillText(series, x, y + 34 * dpr);
+
+    // 角色计数
+    this.ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    this.ctx.font = `${10 * dpr}px monospace`;
+    this.ctx.textAlign = 'right';
+    this.ctx.fillText(`${current}/${total}  [TAB]`, this._width - x, y + 18 * dpr);
+    this.ctx.textAlign = 'left';
+
     this.ctx.restore();
   }
 }

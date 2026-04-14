@@ -7,7 +7,7 @@ import { Renderer } from '@engine/Renderer';
 import { Camera } from '@engine/Camera';
 import { InputManager } from '@engine/InputManager';
 import { EntityManager } from '@engine/EntityManager';
-import { PlayerFactory } from '@entities/PlayerFactory';
+import { CharacterRegistry } from '@data/CharacterRegistry';
 import { MovementSystem } from '@systems/MovementSystem';
 import { RenderSystem } from '@systems/RenderSystem';
 
@@ -23,6 +23,11 @@ export class Game {
   private renderSystem: RenderSystem;
   private _running = false;
 
+  /** 角色切换 */
+  private _charIds: string[];
+  private _charIndex = 0;
+  private _tabPressed = false;
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.renderer = new Renderer(canvas);
@@ -35,6 +40,9 @@ export class Game {
 
     this.loop = new GameLoop(60, this.update.bind(this), this.render.bind(this));
 
+    // 初始化角色列表
+    this._charIds = CharacterRegistry.getAllDefs().map(d => d.id);
+
     // 监听窗口大小变化
     this.handleResize();
     window.addEventListener('resize', () => this.handleResize());
@@ -45,15 +53,28 @@ export class Game {
     if (this._running) return;
     this._running = true;
 
-    // 创建玩家实体
-    const player = PlayerFactory.createBabo('babo_fire');
-    this.entities.add(player);
+    // 创建默认角色 (战士)
+    this.spawnCharacter(this._charIds[0]);
 
-    // 摄像机跟随玩家
+    console.log(`[B-BABO] Game started! ${CharacterRegistry.totalCharacters} characters loaded.`);
+    console.log('[B-BABO] Press TAB to switch character, WASD/Arrows to move.');
+    this.loop.start();
+  }
+
+  /** 生成角色实体 */
+  private spawnCharacter(charId: string): void {
+    // 清除旧实体
+    for (const e of this.entities.getAll()) {
+      this.entities.remove(e.id);
+    }
+
+    const player = CharacterRegistry.createEntity(charId, 3);
+    this.entities.add(player);
     this.camera.setTarget(player);
 
-    console.log('[B-BABO] Game started!');
-    this.loop.start();
+    const def = CharacterRegistry.getDef(charId);
+    const sprite = CharacterRegistry.getSprite(charId);
+    console.log(`[B-BABO] Switched to: ${def?.name} (${sprite?.hironoSeries})`);
   }
 
   /** 停止游戏 */
@@ -66,6 +87,17 @@ export class Game {
   /** 逻辑更新 (fixed timestep) */
   private update(dt: number): void {
     this.input.update();
+
+    // Tab 键切换角色
+    if (this.input.isKeyDown('tab') && !this._tabPressed) {
+      this._tabPressed = true;
+      this._charIndex = (this._charIndex + 1) % this._charIds.length;
+      this.spawnCharacter(this._charIds[this._charIndex]);
+    }
+    if (!this.input.isKeyDown('tab')) {
+      this._tabPressed = false;
+    }
+
     this.movementSystem.update(this.entities, dt);
   }
 
@@ -74,7 +106,19 @@ export class Game {
     this.camera.update();
     this.renderer.clear();
     this.renderSystem.update(this.entities);
-    this.renderer.renderHUD();
+
+    // HUD: 当前角色信息
+    const charId = this._charIds[this._charIndex];
+    const def = CharacterRegistry.getDef(charId);
+    const sprite = CharacterRegistry.getSprite(charId);
+    if (def && sprite) {
+      this.renderer.renderCharacterHUD(
+        def.name,
+        sprite.hironoSeries,
+        this._charIndex + 1,
+        this._charIds.length,
+      );
+    }
   }
 
   /** 处理窗口大小变化 */
