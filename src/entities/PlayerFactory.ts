@@ -1,10 +1,10 @@
 /**
- * 角色工厂 - 创建 B-BABO 系列角色实体
+ * 角色工厂 - 创建 B-BABO 系列 HIRONO 风格角色实体
  */
 
 import { EntityManager, type Entity } from '@engine/EntityManager';
 import { renderPixelSprite, PALETTES, type PaletteKey } from '@engine/PixelRenderer';
-import { BABO_BASE_SPRITE } from '@entities/BaboSprite';
+import { HIRONO_BASE_SPRITE } from '@entities/BaboSprite';
 
 /** 角色定义 */
 interface CharacterDef {
@@ -16,7 +16,7 @@ interface CharacterDef {
   description: string;
 }
 
-/** B-BABO 角色库 */
+/** B-BABO 角色库 (HIRONO 风格) */
 const CHARACTERS: Record<string, CharacterDef> = {
   babo_fire: {
     id: 'babo_fire',
@@ -24,7 +24,7 @@ const CHARACTERS: Record<string, CharacterDef> = {
     palette: 'fire',
     speed: 200,
     hp: 100,
-    description: '火属性 B-BABO，热情如焰',
+    description: '火属性 — 暖橙红调，热情如焰',
   },
   babo_ice: {
     id: 'babo_ice',
@@ -32,7 +32,7 @@ const CHARACTERS: Record<string, CharacterDef> = {
     palette: 'ice',
     speed: 180,
     hp: 120,
-    description: '冰属性 B-BABO，冷静如霜',
+    description: '冰属性 — 冷蓝灰调，冷静如霜',
   },
   babo_thunder: {
     id: 'babo_thunder',
@@ -40,7 +40,7 @@ const CHARACTERS: Record<string, CharacterDef> = {
     palette: 'thunder',
     speed: 220,
     hp: 90,
-    description: '雷属性 B-BABO，迅如闪电',
+    description: '雷属性 — 暖黄金调，迅如闪电',
   },
   babo_nature: {
     id: 'babo_nature',
@@ -48,12 +48,12 @@ const CHARACTERS: Record<string, CharacterDef> = {
     palette: 'nature',
     speed: 190,
     hp: 110,
-    description: '自然属性 B-BABO，生生不息',
+    description: '自然属性 — 柔绿调，生生不息',
   },
 };
 
 export class PlayerFactory {
-  /** 创建 B-BABO 角色实体 */
+  /** 创建 B-BABO 角色实体 (HIRONO 风格) */
   static createBabo(charId: string): Entity {
     const def = CHARACTERS[charId];
     if (!def) {
@@ -63,7 +63,7 @@ export class PlayerFactory {
 
     const palette = PALETTES[def.palette];
     // 渲染 3x 放大精灵 (32×32 → 96×96)
-    const sprite = renderPixelSprite(BABO_BASE_SPRITE, palette, 3);
+    const sprite = renderPixelSprite(HIRONO_BASE_SPRITE, palette, 3);
 
     return {
       id: EntityManager.nextId(),
