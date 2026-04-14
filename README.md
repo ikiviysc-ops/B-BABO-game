@@ -1,2 +1,1 @@
-# B-BABO-game
-游戏
+# B-BABO Survivors: Endless Abyss
