@@ -154,14 +154,19 @@ export class CombatSystem {
     }
   }
 
-  /** 获取敌人 XP 掉落量 */
-  private getEnemyXpDrop(enemyId: string): number {
+  /** 获取敌人 XP 掉落量（公开） */
+  getEnemyXpDrop(enemyId: string): number {
     const xpMap: Record<string, number> = {
       rotting_rat: 5, skeleton: 10, night_bat: 8, thorn_vine: 12,
       fire_slime: 15, ice_slime: 15, lightning_wisp: 18, skeleton_archer: 14,
       evil_eye: 22, death_knight: 30, vampire: 25, giant_zombie: 40,
     };
     return xpMap[enemyId] ?? 10;
+  }
+
+  /** 公开方法：直接添加浮动文字（近战用） */
+  addFloatingTextDirect(x: number, y: number, text: string, color: string): void {
+    this.addFloatingText(x, y, text, color);
   }
 
   /** 添加浮动文字 */

@@ -158,18 +158,17 @@ export function renderPixelSprite(
   data: PixelData,
   palette: Record<string, string>,
   scale = 1,
-): OffscreenCanvas {
-  const canvas = new OffscreenCanvas(
-    data.width * scale,
-    data.height * scale,
-  );
+): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = data.width * scale;
+  canvas.height = data.height * scale;
   const ctx = canvas.getContext('2d')!;
   ctx.imageSmoothingEnabled = false;
 
   for (let y = 0; y < data.height; y++) {
     for (let x = 0; x < data.width; x++) {
       const colorKey = data.pixels[y]?.[x];
-      if (!colorKey) continue; // 透明
+      if (!colorKey) continue;
 
       const color = palette[colorKey] ?? colorKey;
       if (color === 'transparent') continue;
@@ -189,6 +188,6 @@ export function applyPalette(
   baseData: PixelData,
   newPalette: Record<string, string>,
   scale = 1,
-): OffscreenCanvas {
+): HTMLCanvasElement {
   return renderPixelSprite(baseData, newPalette, scale);
 }

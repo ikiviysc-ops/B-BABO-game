@@ -89,17 +89,17 @@ export class LevelUpSystem {
     // 属性强化（始终可用）
     pool.push({
       id: 'hp_boost', name: '生命强化', description: '最大HP +20',
-      icon: '❤️', type: 'stat_boost',
+      icon: 'hp_boost', type: 'stat_boost',
       apply: () => { this._bonusMaxHp += 20; },
     });
     pool.push({
       id: 'speed_boost', name: '疾步', description: '移动速度 +15%',
-      icon: '👟', type: 'stat_boost',
+      icon: 'speed_boost', type: 'stat_boost',
       apply: () => { this._bonusSpeed += 15; },
     });
     pool.push({
       id: 'damage_boost', name: '力量', description: '全伤害 +10%',
-      icon: '⚔️', type: 'stat_boost',
+      icon: 'damage_boost', type: 'stat_boost',
       apply: () => { this._damageMultiplier += 0.1; },
     });
 
@@ -108,16 +108,39 @@ export class LevelUpSystem {
     const shuffledWeapons = weaponEntries.sort(() => Math.random() - 0.5);
     for (let i = 0; i < Math.min(3, shuffledWeapons.length); i++) {
       const w = shuffledWeapons[i];
+      const typeLabel = w.type === 'melee' ? '近战' : w.type === 'ranged' ? '远程' : '特殊';
+      const desc = this.buildWeaponDesc(w);
       pool.push({
-        id: `new_${w.id}`, name: w.name, description: `获得新武器: ${w.name}`,
-        icon: w.type === 'melee' ? '🗡️' : w.type === 'ranged' ? '🏹' : '✨',
+        id: `new_${w.id}`, name: w.name,
+        description: `${typeLabel} | ${desc}`,
+        icon: w.id,
         type: 'new_weapon',
-        apply: () => {}, // 由 Game.ts 处理
+        apply: () => {},
         _weaponDef: w,
       } as LevelUpOption & { _weaponDef: WeaponDef });
     }
 
     return pool;
+  }
+
+  /** 生成武器描述 */
+  private buildWeaponDesc(w: WeaponDef): string {
+    const parts: string[] = [];
+    parts.push(`伤害${w.damage}`);
+    parts.push(`攻速${w.fireRate}/s`);
+    if (w.type !== 'melee') {
+      parts.push(`射程${w.range}`);
+    }
+    if (w.pierce && w.pierce > 0) parts.push(`穿透${w.pierce}`);
+    if (w.aoe && w.aoe > 0) parts.push(`爆炸${w.aoe}px`);
+    if (w.tracking) parts.push('追踪');
+    if (w.projectileCount && w.projectileCount > 1) parts.push(`${w.projectileCount}发散`);
+    if (w.element) {
+      const elMap: Record<string, string> = { fire: '🔥火', ice: '❄️冰', thunder: '⚡雷', nature: '🌿自然' };
+      parts.push(elMap[w.element] || w.element);
+    }
+    if (w.special) parts.push(w.special);
+    return parts.join(' ');
   }
 
   /** 选择升级选项 */

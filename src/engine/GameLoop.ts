@@ -1,16 +1,25 @@
 /**
  * 固定时间步长游戏循环
- * 逻辑以固定频率更新，渲染以屏幕刷新率执行
+ *
+ * - 错误捕获：update/render异常不会崩溃循环
+ * - FPS监控
  */
 
 export class GameLoop {
-  private readonly _fixedDt: number;   // 固定逻辑步长 (秒)
+  private readonly _fixedDt: number;
   private readonly _updateFn: (dt: number) => void;
   private readonly _renderFn: () => void;
   private _running = false;
   private _lastTime = 0;
   private _accumulator = 0;
   private _rafId = 0;
+
+  // FPS
+  private _fpsFrames = 0;
+  private _fpsAccTime = 0;
+  private _currentFps = 60;
+
+  get fps(): number { return this._currentFps; }
 
   constructor(
     fixedFps: number,
@@ -38,23 +47,46 @@ export class GameLoop {
   private tick(now: number): void {
     if (!this._running) return;
 
-    let frameTime = (now - this._lastTime) / 1000;
-    this._lastTime = now;
+    try {
+      let frameTime = (now - this._lastTime) / 1000;
+      this._lastTime = now;
+      if (frameTime > 0.25) frameTime = 0.25;
+      this._accumulator += frameTime;
 
-    // 防止螺旋死亡 (标签页切回时)
-    if (frameTime > 0.25) frameTime = 0.25;
+      // 逻辑更新（防死亡螺旋）
+      let steps = 0;
+      while (this._accumulator >= this._fixedDt && steps < 4) {
+        try {
+          this._updateFn(this._fixedDt);
+        } catch (e) {
+          console.error('[GameLoop] update error:', e);
+        }
+        this._accumulator -= this._fixedDt;
+        steps++;
+      }
+      if (this._accumulator > this._fixedDt * 2) {
+        this._accumulator = 0;
+      }
 
-    this._accumulator += frameTime;
+      // 渲染
+      try {
+        this._renderFn();
+      } catch (e) {
+        console.error('[GameLoop] render error:', e);
+      }
 
-    while (this._accumulator >= this._fixedDt) {
-      this._updateFn(this._fixedDt);
-      this._accumulator -= this._fixedDt;
+      // FPS
+      this._fpsFrames++;
+      this._fpsAccTime += frameTime;
+      if (this._fpsAccTime >= 1.0) {
+        this._currentFps = this._fpsFrames;
+        this._fpsFrames = 0;
+        this._fpsAccTime -= 1.0;
+      }
+    } catch (e) {
+      console.error('[GameLoop] tick error:', e);
     }
 
-    // 渲染插值因子 (可用于平滑渲染)
-    // const alpha = this._accumulator / this._fixedDt;
-
-    this._renderFn();
     this._rafId = requestAnimationFrame((t) => this.tick(t));
   }
 }

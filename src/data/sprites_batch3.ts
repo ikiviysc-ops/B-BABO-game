@@ -1,524 +1,299 @@
+/**
+ * HIRONO 小野风格像素精灵 - 批次3
+ *
+ * 角色：
+ * 11. fallen_angel — 小野·堕落天使（堕落/白翅渐灰+金光环+深红/断翼/悲伤眼）
+ * 12. monster      — 小野·怪物（黑暗/深紫+荧光粉/暗影触手/异形瞳）
+ * 13. insight      — 小野·洞察（理解/靛蓝+金瞳+深蓝/全视之眼/智慧眼）
+ * 14. echo         — 小野·回声（共鸣/银灰+青色波纹/波纹纹理/平静眼）
+ * 15. vagrancy     — 小野·流浪（漂泊/大地色+破旧感/旅人之杖/疲惫眼）
+ */
 import type { PixelData } from '@engine/PixelRenderer';
 
-export const SPRITES_BATCH_3 = [
-  // ============================================================
-  // 11. DRUID 德鲁伊 — Shelter系列Cabin造型
-  // 木屋/自然元素，藤蔓装饰，叶子头饰，温暖棕绿色调
-  // ============================================================
+interface CharacterSprite {
+  readonly id: string;
+  readonly name: string;
+  readonly hironoSeries: string;
+  readonly palette: Record<string, string>;
+  readonly sprite: PixelData;
+}
+
+// HIRONO 基础体型模板（32x32），所有角色共用此基础结构
+// 只需修改调色板和特定配饰像素即可创建独特角色
+const HIRONO_BASE: string[][] = [
+  ['','','','','','hairDk','hair','hair','hair','hairDk','hairDk','hair','hair','','','hair','hair','hairDk','hairDk','hair','hair','','','','','','','','','','',''],
+  ['','','','hairDk','hair','hair','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairDk','hair','','','','','',''],
+  ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairDk','hairDk','','','','',''],
+  ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','outline','','','','',''],
+  ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','outline','','','','',''],
+  ['','outline','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','outline','','','','','',''],
+  ['','outline','hairDk','hairDk','hair','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','hair','hair','hairDk','hairDk','outline','','','','',''],
+  ['','outline','hairDk','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','outline','','','','',''],
+  ['','outline','skinSh','skin','skin','skin','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skin','skinSh','skinSh','outline','','','','',''],
+  ['outline','outline','skinSh','skin','skin','lidSh','lidSh','lidSh','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skinSh','outline','outline','','','','',''],
+  ['outline','skinSh','skin','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skinSh','outline','','','','',''],
+  ['outline','skinSh','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skinSh','outline','','','','','',''],
+  ['outline','skinSh','skin','skin','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skinSh','outline','','','','',''],
+  ['','outline','skinSh','skin','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','','',''],
+  ['','outline','skinSh','blush','blush','blush','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','blush','blush','blush','skin','skinSh','outline','','','','','','','',''],
+  ['','outline','skinSh','blush','blush','skin','skin','skin','skin','nose','nose','nose','skin','skin','skin','skin','skin','skin','skin','blush','blush','skin','skinSh','outline','','','','','','','',''],
+  ['','outline','outline','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','mouth','mouth','skin','skin','skin','skin','skin','skin','skin','skinSh','outline','outline','','','','','',''],
+  ['','','outline','outline','skinSh','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skinSh','skinSh','skinSh','outline','outline','','','','','','','',''],
+  ['','','','outline','outline','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','outline','outline','','','','','',''],
+  ['','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''],
+  ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''],
+  ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''],
+  ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''],
+  ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''],
+  ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''],
+  ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''],
+  ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''],
+  ['','outline','coatLn','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','coatLn','outline','','','','',''],
+  ['','','outline','outline','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','outline','outline','','','','','','','',''],
+  ['','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','',''],
+  ['','','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','','','','',''],
+  ['','','','','','','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','','','','','','','','','',''],
+  ['','','','','','','','','outline','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','outline','','','','','','','','','','','',''],
+];
+
+// ============================================================
+// 11. FALLEN_ANGEL — 小野·堕落天使
+// 堕落情绪：白翅渐灰+金光环+深红，断翼装饰
+// 配饰：头顶金光环、身侧断翼、深红瞳孔
+// ============================================================
+const FALLEN_ANGEL_PALETTE = {
+  hair:    '#c0c0c0',
+  hairHi:  '#e0e0e0',
+  hairDk:  '#808080',
+  skin:    '#f0e8e0',
+  skinSh:  '#e0d0c0',
+  blush:   '#d8a0a0',
+  nose:    '#c88888',
+  eyeW:    '#f4f0e8',
+  eyeI:    '#a02020',
+  eyeB:    '#404040',
+  lid:     '#e0d4c8',
+  lidSh:   '#c8b8a0',
+  mouth:   '#b09080',
+  coat:    '#e8e0e0',
+  coatHi:  '#f8f4f0',
+  coatDk:  '#a0a0a0',
+  coatLn:  '#707070',
+  inner:   '#f0ece8',
+  shoe:    '#606060',
+  outline: '#303030',
+  white:   '#ffffff',
+  halo:    '#f0d060',
+  haloHi:  '#f8e8a0',
+  wing:    '#d0d0d0',
+  wingDk:  '#909090',
+  blood:   '#c02020',
+};
+
+// 堕落天使精灵：基础体型 + 金光环(row0) + 断翼(row2-4左侧)
+const FALLEN_ANGEL_PIXELS = HIRONO_BASE.map((row, y) => {
+  if (y === 0) return ['','','','','','haloHi','halo','halo','halo','haloHi','halo','halo','halo','halo','halo','halo','halo','halo','halo','halo','halo','halo','halo','haloHi','','','','','','',''];
+  if (y === 2) return ['wingDk','wing','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairDk','hairDk','','','','',''];
+  if (y === 3) return ['wing','wingDk','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','outline','','','','',''];
+  if (y === 4) return ['wingDk','wing','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','outline','','','','',''];
+  return [...row];
+});
+
+// ============================================================
+// 12. MONSTER — 小野·怪物
+// 黑暗情绪：深紫+荧光粉，暗影触手
+// 配饰：荧光粉色瞳孔、触手纹理外套
+// ============================================================
+const MONSTER_PALETTE = {
+  hair:    '#3a2040',
+  hairHi:  '#5a3860',
+  hairDk:  '#201028',
+  skin:    '#e0d0e0',
+  skinSh:  '#c8b0c8',
+  blush:   '#d090c0',
+  nose:    '#c080b0',
+  eyeW:    '#f0e8f0',
+  eyeI:    '#ff40a0',
+  eyeB:    '#1a0820',
+  lid:     '#d0c0d0',
+  lidSh:   '#b0a0b8',
+  mouth:   '#a08898',
+  coat:    '#402050',
+  coatHi:  '#583068',
+  coatDk:  '#281038',
+  coatLn:  '#180820',
+  inner:   '#d0c0d8',
+  shoe:    '#180820',
+  outline: '#0a0410',
+  white:   '#ffffff',
+  tentacle:'#ff60b0',
+  tentDk:  '#c03080',
+};
+
+// 怪物精灵：基础体型 + 触手纹理
+const MONSTER_PIXELS = HIRONO_BASE.map((row, y) => {
+  if (y === 19) return ['','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','tentacle','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''];
+  if (y === 20) return ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','tentDk','tentacle','tentDk','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''];
+  if (y === 21) return ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','tentacle','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''];
+  if (y === 22) return ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''];
+  return [...row];
+});
+
+// ============================================================
+// 13. INSIGHT — 小野·洞察
+// 理解情绪：靛蓝+金瞳+深蓝，全视之眼
+// 配饰：额头第三只眼（金色）、金瞳
+// ============================================================
+const INSIGHT_PALETTE = {
+  hair:    '#2a3060',
+  hairHi:  '#3a4880',
+  hairDk:  '#181e40',
+  skin:    '#e8e0f0',
+  skinSh:  '#d0c8e0',
+  blush:   '#c0a0d0',
+  nose:    '#b088c0',
+  eyeW:    '#f0ecf8',
+  eyeI:    '#d8a020',
+  eyeB:    '#101830',
+  lid:     '#d8d0e0',
+  lidSh:   '#b8a8c8',
+  mouth:   '#a090b0',
+  coat:    '#303868',
+  coatHi:  '#404880',
+  coatDk:  '#202050',
+  coatLn:  '#141838',
+  inner:   '#e0d8f0',
+  shoe:    '#141838',
+  outline: '#0a0e20',
+  white:   '#ffffff',
+  thirdEye:'#f0c030',
+  thirdGlow:'#f8e060',
+};
+
+// 洞察精灵：基础体型 + 额头第三只眼(row6)
+const INSIGHT_PIXELS = HIRONO_BASE.map((row, y) => {
+  if (y === 6) return ['','outline','hairDk','hairDk','hair','skin','skin','skin','skin','skin','thirdGlow','thirdEye','thirdGlow','skin','skin','skin','skin','skin','skin','skin','skin','hair','hair','hairDk','hairDk','outline','','','','',''];
+  return [...row];
+});
+
+// ============================================================
+// 14. ECHO — 小野·回声
+// 共鸣情绪：银灰+青色波纹，波纹纹理
+// 配饰：波纹纹理外套、青色瞳孔
+// ============================================================
+const ECHO_PALETTE = {
+  hair:    '#8090a0',
+  hairHi:  '#a0b0c0',
+  hairDk:  '#506070',
+  skin:    '#f0ece8',
+  skinSh:  '#e0dcd8',
+  blush:   '#c8a8b8',
+  nose:    '#b898a8',
+  eyeW:    '#f4f4f4',
+  eyeI:    '#40a0b0',
+  eyeB:    '#303840',
+  lid:     '#dcd8e0',
+  lidSh:   '#c0b8c8',
+  mouth:   '#a09898',
+  coat:    '#90a0b0',
+  coatHi:  '#b0c0d0',
+  coatDk:  '#607080',
+  coatLn:  '#405060',
+  inner:   '#e0e8f0',
+  shoe:    '#405060',
+  outline: '#202830',
+  white:   '#ffffff',
+  wave:    '#60c0d0',
+  waveHi:  '#80e0f0',
+};
+
+// 回声精灵：基础体型 + 波纹纹理
+const ECHO_PIXELS = HIRONO_BASE.map((row, y) => {
+  if (y === 19) return ['','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''];
+  if (y === 20) return ['','outline','coatLn','coat','coat','coat','coat','coat','coat','wave','waveHi','wave','waveHi','wave','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''];
+  if (y === 21) return ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','wave','wave','wave','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''];
+  if (y === 22) return ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''];
+  return [...row];
+});
+
+// ============================================================
+// 15. VAGRANCY — 小野·流浪
+// 漂泊情绪：大地色+破旧感，旅人之杖
+// 配饰：旅人之杖（右手）、破旧补丁外套
+// ============================================================
+const VAGRANCY_PALETTE = {
+  hair:    '#8a7860',
+  hairHi:  '#a89878',
+  hairDk:  '#605040',
+  skin:    '#f0e0cc',
+  skinSh:  '#e0cca8',
+  blush:   '#d8a088',
+  nose:    '#c88878',
+  eyeW:    '#f6f0e8',
+  eyeI:    '#504030',
+  eyeB:    '#2a2018',
+  lid:     '#e0d0b8',
+  lidSh:   '#c8b098',
+  mouth:   '#b09880',
+  coat:    '#9a8868',
+  coatHi:  '#b0a080',
+  coatDk:  '#6a5838',
+  coatLn:  '#4a3820',
+  inner:   '#e0d4b8',
+  shoe:    '#4a3820',
+  outline: '#2a1e10',
+  white:   '#ffffff',
+  staff:   '#7a6040',
+  staffHi: '#9a8060',
+  patch:   '#807050',
+};
+
+// 流浪精灵：基础体型 + 旅人之杖(row21-23右侧) + 补丁(row19)
+const VAGRANCY_PIXELS = HIRONO_BASE.map((row, y) => {
+  if (y === 19) return ['','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''];
+  if (y === 21) return ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','staff','staff','coatLn','outline','','','',''];
+  if (y === 22) return ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','staffHi','staff','coatLn','outline','','','',''];
+  if (y === 23) return ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','staffHi','staff','coatLn','outline','','','',''];
+  return [...row];
+});
+
+// ============================================================
+// 导出所有精灵
+// ============================================================
+export const SPRITES_BATCH_3: CharacterSprite[] = [
   {
-    id: 'druid',
-    name: 'B-BABO德鲁伊',
-    hironoSeries: 'Shelter - Cabin',
-    palette: {
-      // 基础HIRONO色
-      hair:    '#6b7a4e',
-      hairHi:  '#8a9a6a',
-      hairDk:  '#4a5838',
-      skin:    '#f0e4cc',
-      skinSh:  '#dcc8a8',
-      blush:   '#d4a088',
-      nose:    '#c88878',
-      eyeW:    '#f6f2ec',
-      eyeI:    '#3a4a28',
-      eyeB:    '#2a3418',
-      lid:     '#e0d4b8',
-      lidSh:   '#c4b498',
-      mouth:   '#b89880',
-      coat:    '#7a6a4a',
-      coatHi:  '#96886a',
-      coatDk:  '#5a4a34',
-      coatLn:  '#3e3224',
-      inner:   '#d8ccb0',
-      shoe:    '#4a3a28',
-      outline: '#2a2018',
-      white:   '#ffffff',
-      // 德鲁伊特有色
-      vine:    '#5a8a48',
-      leaf:    '#6aaa54',
-      leafHi:  '#88c478',
-      bark:    '#8a6a44',
-    },
-    sprite: {
-      width: 32,
-      height: 32,
-      pixels: [
-        // Row 0-2: 头顶 - 碎短发 + 叶子头饰
-        ['','','','','','','leafHi','leaf','leaf','hairDk','hairDk','hair','hair','','','hair','hair','hairDk','hairDk','hair','hair','leaf','leaf','leafHi','','','','','','','',''],
-        ['','','','','','hairDk','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairDk','hair','hair','','','','',''],
-        ['','','','hairDk','hair','hair','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hair','hairDk','hairDk','','','',''],
-
-        // Row 3-5: 头发上部 + 额头
-        ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','','',''],
-        ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','outline','','',''],
-        ['','outline','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','outline','','','',''],
-
-        // Row 6-7: 额头 + 眉毛区域
-        ['','outline','hairDk','hairDk','hair','hair','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','hair','hair','hairDk','hairDk','outline','','','',''],
-        ['','outline','hairDk','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','outline','','','','',''],
-
-        // Row 8-9: 浮肿眼皮（HIRONO标志）
-        ['','outline','skinSh','skin','skin','skin','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skin','skinSh','skinSh','outline','','','','',''],
-        ['outline','outline','skinSh','skin','skin','lidSh','lidSh','lidSh','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skinSh','outline','outline','','','','',''],
-
-        // Row 10-11: 大眼睛
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skinSh','outline','','','','',''],
-        ['outline','skinSh','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skinSh','outline','','','','','',''],
-
-        // Row 12-13: 眼睛下部
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','',''],
-        ['','outline','skinSh','skin','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','','',''],
-
-        // Row 14-15: 鼻子 + 嘴巴 + 腮红
-        ['','outline','skinSh','blush','blush','blush','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','blush','blush','blush','skin','skinSh','outline','','','','','','','',''],
-        ['','outline','skinSh','blush','blush','skin','skin','skin','skin','nose','nose','nose','skin','skin','skin','skin','skin','skin','skin','blush','blush','skin','skinSh','outline','','','','','','','',''],
-
-        // Row 16-17: 下巴 + 脖子 + 藤蔓领口
-        ['','outline','outline','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','mouth','mouth','skin','skin','skin','skin','skin','skin','skin','skinSh','outline','outline','','','','','',''],
-        ['','','outline','outline','skinSh','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skinSh','skinSh','skinSh','outline','outline','','','','','','','',''],
-
-        // Row 18-19: 宽松外套上部 + 藤蔓装饰
-        ['','','','outline','outline','outline','vine','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','vine','outline','outline','outline','','','','','',''],
-        ['','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''],
-
-        // Row 20-23: 外套主体（宽松感）+ 树皮纹理
-        ['','outline','coatLn','coat','coat','bark','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','bark','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-
-        // Row 24-25: 外套下部 + 叶子装饰
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','leaf','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','leaf','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-
-        // Row 26-27: 外套下摆 + 藤蔓
-        ['','outline','coatLn','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','coatLn','outline','','','','',''],
-        ['','','outline','outline','coatLn','vine','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','vine','coatLn','outline','outline','','','','','','','',''],
-
-        // Row 28-29: 腿/裤子
-        ['','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','',''],
-        ['','','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','','','',''],
-
-        // Row 30-31: 鞋子
-        ['','','','','','','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','','','','','','','','','',''],
-        ['','','','','','','','','outline','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','outline','','','','','','','','','','','',''],
-      ],
-    } as PixelData,
+    id: 'fallen_angel',
+    name: '小野·堕落天使',
+    hironoSeries: 'HIRONO - 堕落',
+    palette: FALLEN_ANGEL_PALETTE,
+    sprite: { width: 32, height: 32, pixels: FALLEN_ANGEL_PIXELS },
   },
-
-  // ============================================================
-  // 12. MECH 机甲 — Little Mischief系列Robot造型
-  // 机器人头盔，机械关节，天线，金属灰蓝色调
-  // ============================================================
   {
-    id: 'mech',
-    name: 'B-BABO机甲',
-    hironoSeries: 'Little Mischief - Robot',
-    palette: {
-      // 基础HIRONO色
-      hair:    '#7a8a9a',
-      hairHi:  '#9aaab8',
-      hairDk:  '#4a5a68',
-      skin:    '#e8e4ec',
-      skinSh:  '#d0c8d8',
-      blush:   '#c088c8',
-      nose:    '#a878b8',
-      eyeW:    '#f4f2f8',
-      eyeI:    '#3a4a6e',
-      eyeB:    '#2a3450',
-      lid:     '#d0c8dc',
-      lidSh:   '#b0a4c0',
-      mouth:   '#9888a8',
-      coat:    '#6a7a8a',
-      coatHi:  '#8a9aa8',
-      coatDk:  '#4a5a68',
-      coatLn:  '#3a4858',
-      inner:   '#c8d0dc',
-      shoe:    '#3a4a58',
-      outline: '#1e2a38',
-      white:   '#ffffff',
-      // 机甲特有色
-      metal:   '#8a9aaa',
-      metalHi: '#a8baca',
-      metalDk: '#5a6a7a',
-      antenna: '#c8a040',
-      bolt:    '#d0c050',
-    },
-    sprite: {
-      width: 32,
-      height: 32,
-      pixels: [
-        // Row 0-2: 头顶 - 头盔 + 天线
-        ['','','','','','antenna','antenna','','','','metalDk','metalDk','metal','metal','','','metal','metal','metalDk','metalDk','metal','metal','','','','','','','','','',''],
-        ['','','','','','','','metalDk','metal','metal','metal','metal','metalHi','metalHi','metal','metal','metal','metal','metalHi','metalHi','metal','metal','metal','metal','metalDk','metal','metal','','','','',''],
-        ['','','','metalDk','metal','metal','metal','metal','metal','metal','metal','metalHi','metalHi','metal','metal','metal','metal','metal','metalHi','metalHi','metal','metal','metal','metal','metal','metal','metalDk','metalDk','','','',''],
-
-        // Row 3-5: 头盔上部 + 额头面板
-        ['','metalDk','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metalDk','metalDk','','',''],
-        ['','metalDk','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metalDk','outline','','',''],
-        ['','outline','metalDk','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metal','metalDk','metalDk','outline','','','',''],
-
-        // Row 6-7: 额头 + 螺栓装饰
-        ['','outline','metalDk','metalDk','metal','metal','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','metal','metal','metalDk','metalDk','outline','','','',''],
-        ['','outline','metalDk','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','outline','','','','',''],
-
-        // Row 8-9: 浮肿眼皮
-        ['','outline','skinSh','skin','skin','skin','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skin','skinSh','skinSh','outline','','','','',''],
-        ['outline','outline','skinSh','skin','skin','lidSh','lidSh','lidSh','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skinSh','outline','outline','','','','',''],
-
-        // Row 10-11: 大眼睛
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skinSh','outline','','','','',''],
-        ['outline','skinSh','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skinSh','outline','','','','','',''],
-
-        // Row 12-13: 眼睛下部
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','',''],
-        ['','outline','skinSh','skin','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','','',''],
-
-        // Row 14-15: 鼻子 + 嘴巴 + 腮红
-        ['','outline','skinSh','blush','blush','blush','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','blush','blush','blush','skin','skinSh','outline','','','','','','','',''],
-        ['','outline','skinSh','blush','blush','skin','skin','skin','skin','nose','nose','nose','skin','skin','skin','skin','skin','skin','skin','blush','blush','skin','skinSh','outline','','','','','','','',''],
-
-        // Row 16-17: 下巴 + 脖子 + 机械领口
-        ['','outline','outline','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','mouth','mouth','skin','skin','skin','skin','skin','skin','skin','skinSh','outline','outline','','','','','',''],
-        ['','','outline','outline','skinSh','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skinSh','skinSh','skinSh','outline','outline','','','','','','','',''],
-
-        // Row 18-19: 机械装甲上部
-        ['','','','outline','outline','outline','metalDk','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','metalDk','outline','outline','outline','','','','',''],
-        ['','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''],
-
-        // Row 20-23: 机械装甲主体 + 螺栓
-        ['','outline','coatLn','coat','coat','bolt','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','bolt','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-
-        // Row 24-25: 装甲下部 + 机械关节
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','metalDk','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','metalDk','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-
-        // Row 26-27: 装甲下摆
-        ['','outline','coatLn','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','coatLn','outline','','','','',''],
-        ['','','outline','outline','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','outline','outline','','','','','','','','',''],
-
-        // Row 28-29: 腿/机械腿
-        ['','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','',''],
-        ['','','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','','','',''],
-
-        // Row 30-31: 机械靴
-        ['','','','','','','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','','','','','','','','','',''],
-        ['','','','','','','','','outline','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','outline','','','','','','','','','','','',''],
-      ],
-    } as PixelData,
+    id: 'monster',
+    name: '小野·怪物',
+    hironoSeries: 'HIRONO - 黑暗',
+    palette: MONSTER_PALETTE,
+    sprite: { width: 32, height: 32, pixels: MONSTER_PIXELS },
   },
-
-  // ============================================================
-  // 13. BARD 吟游 — Echo系列Poem造型
-  // 诗人气质，围巾/披风，手持乐器暗示，暖米色调
-  // ============================================================
   {
-    id: 'bard',
-    name: 'B-BABO吟游',
-    hironoSeries: 'Echo - Poem',
-    palette: {
-      // 基础HIRONO色
-      hair:    '#8a7a5e',
-      hairHi:  '#a89478',
-      hairDk:  '#5e5240',
-      skin:    '#f2e8d4',
-      skinSh:  '#dcc8a8',
-      blush:   '#d8a890',
-      nose:    '#c89080',
-      eyeW:    '#f8f4ee',
-      eyeI:    '#4a3a28',
-      eyeB:    '#3a2e1e',
-      lid:     '#e4d8c0',
-      lidSh:   '#c8b898',
-      mouth:   '#c4a088',
-      coat:    '#b8a080',
-      coatHi:  '#d0b898',
-      coatDk:  '#8a7460',
-      coatLn:  '#6a5844',
-      inner:   '#e8dcc8',
-      shoe:    '#5a4a38',
-      outline: '#2e2418',
-      white:   '#ffffff',
-      // 吟游特有色
-      cloak:   '#8a7a6a',
-      cloakHi: '#a89888',
-      note:    '#c8a870',
-      lute:    '#a08050',
-    },
-    sprite: {
-      width: 32,
-      height: 32,
-      pixels: [
-        // Row 0-2: 头顶 - 凌乱碎短发
-        ['','','','','','','','hair','hair','hairDk','hairDk','hair','hair','','','hair','hair','hairDk','hairDk','hair','hair','','','','','','','','','','',''],
-        ['','','','','','hairDk','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairDk','hair','hair','','','','',''],
-        ['','','','hairDk','hair','hair','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hair','hairDk','hairDk','','','',''],
-
-        // Row 3-5: 头发上部 + 额头
-        ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','','',''],
-        ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','outline','','',''],
-        ['','outline','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','outline','','','',''],
-
-        // Row 6-7: 额头 + 眉毛区域
-        ['','outline','hairDk','hairDk','hair','hair','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','hair','hair','hairDk','hairDk','outline','','','',''],
-        ['','outline','hairDk','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','outline','','','','',''],
-
-        // Row 8-9: 浮肿眼皮
-        ['','outline','skinSh','skin','skin','skin','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skin','skinSh','skinSh','outline','','','','',''],
-        ['outline','outline','skinSh','skin','skin','lidSh','lidSh','lidSh','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skinSh','outline','outline','','','','',''],
-
-        // Row 10-11: 大眼睛
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skinSh','outline','','','','',''],
-        ['outline','skinSh','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skinSh','outline','','','','','',''],
-
-        // Row 12-13: 眼睛下部
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','',''],
-        ['','outline','skinSh','skin','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','','',''],
-
-        // Row 14-15: 鼻子 + 嘴巴 + 腮红
-        ['','outline','skinSh','blush','blush','blush','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','blush','blush','blush','skin','skinSh','outline','','','','','','','',''],
-        ['','outline','skinSh','blush','blush','skin','skin','skin','skin','nose','nose','nose','skin','skin','skin','skin','skin','skin','skin','blush','blush','skin','skinSh','outline','','','','','','','',''],
-
-        // Row 16-17: 下巴 + 脖子 + 围巾
-        ['','outline','outline','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','mouth','mouth','skin','skin','skin','skin','skin','skin','skin','skinSh','outline','outline','','','','','',''],
-        ['','','outline','outline','skinSh','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skinSh','skinSh','skinSh','outline','outline','','','','','','','',''],
-
-        // Row 18-19: 披风上部 + 围巾
-        ['','','','outline','outline','outline','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','outline','outline','outline','','','','','',''],
-        ['cloak','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''],
-
-        // Row 20-23: 披风主体 + 乐器暗示
-        ['cloak','cloak','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['cloak','cloak','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['cloak','cloakHi','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','',''],
-        ['cloak','cloak','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-
-        // Row 24-25: 披风下部 + 音符装饰
-        ['cloak','cloak','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','cloak','coatLn','coat','coat','coat','coat','coat','coat','note','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-
-        // Row 26-27: 披风下摆
-        ['','outline','coatLn','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','coatLn','outline','','','','',''],
-        ['','','outline','outline','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','outline','outline','','','','','','','','',''],
-
-        // Row 28-29: 腿/裤子
-        ['','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','',''],
-        ['','','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','','','',''],
-
-        // Row 30-31: 鞋子
-        ['','','','','','','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','','','','','','','','','',''],
-        ['','','','','','','','','outline','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','outline','','','','','','','','','','','',''],
-      ],
-    } as PixelData,
+    id: 'insight',
+    name: '小野·洞察',
+    hironoSeries: 'HIRONO - 理解',
+    palette: INSIGHT_PALETTE,
+    sprite: { width: 32, height: 32, pixels: INSIGHT_PIXELS },
   },
-
-  // ============================================================
-  // 14. WEREWOLF 狼人 — Monsters Carnival系列Killer Bunny造型
-  // 恶兔长耳朵（竖起），野性表情，獠牙暗示，暗红棕色调
-  // ============================================================
   {
-    id: 'werewolf',
-    name: 'B-BABO狼人',
-    hironoSeries: 'Monsters Carnival - Killer Bunny',
-    palette: {
-      // 基础HIRONO色
-      hair:    '#6a4a3a',
-      hairHi:  '#8a6a5a',
-      hairDk:  '#4a3028',
-      skin:    '#f0dcc8',
-      skinSh:  '#d8c0a8',
-      blush:   '#d89888',
-      nose:    '#c88070',
-      eyeW:    '#f6f0ec',
-      eyeI:    '#8a2020',
-      eyeB:    '#3a1a18',
-      lid:     '#dcc8b0',
-      lidSh:   '#c0a890',
-      mouth:   '#b87868',
-      coat:    '#7a4a3a',
-      coatHi:  '#9a6858',
-      coatDk:  '#5a3428',
-      coatLn:  '#3e2218',
-      inner:   '#d8c0a8',
-      shoe:    '#4a2a1e',
-      outline: '#2a1410',
-      white:   '#ffffff',
-      // 狼人特有色
-      ear:     '#8a5a48',
-      earIn:   '#d8a098',
-      fang:    '#f0ece8',
-      claw:    '#c0b0a0',
-    },
-    sprite: {
-      width: 32,
-      height: 32,
-      pixels: [
-        // Row 0-2: 头顶 - 竖起的兔子耳朵
-        ['','','','ear','ear','ear','','','','','','hairDk','hairDk','hair','hair','','','hair','hair','hairDk','hairDk','hair','hair','','','','ear','ear','ear','','',''],
-        ['','','','ear','earIn','ear','','','','','','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hairDk','hair','hair','','','',''],
-        ['','','','ear','ear','ear','','','hairDk','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairDk','hairDk','','','',''],
-
-        // Row 3-5: 头发上部 + 额头
-        ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','','',''],
-        ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','outline','','',''],
-        ['','outline','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','outline','','','',''],
-
-        // Row 6-7: 额头 + 眉毛区域（野性眉毛）
-        ['','outline','hairDk','hairDk','hair','hair','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','hair','hair','hairDk','hairDk','outline','','','',''],
-        ['','outline','hairDk','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','outline','','','','',''],
-
-        // Row 8-9: 浮肿眼皮（略带野性）
-        ['','outline','skinSh','skin','skin','skin','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skin','skinSh','skinSh','outline','','','','',''],
-        ['outline','outline','skinSh','skin','skin','lidSh','lidSh','lidSh','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skinSh','outline','outline','','','','',''],
-
-        // Row 10-11: 大眼睛（红色瞳孔 - 野性）
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skinSh','outline','','','','',''],
-        ['outline','skinSh','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skinSh','outline','','','','','',''],
-
-        // Row 12-13: 眼睛下部
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','',''],
-        ['','outline','skinSh','skin','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','','',''],
-
-        // Row 14-15: 鼻子 + 嘴巴 + 獠牙 + 腮红
-        ['','outline','skinSh','blush','blush','blush','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','blush','blush','blush','skin','skinSh','outline','','','','','','','',''],
-        ['','outline','skinSh','blush','blush','skin','skin','skin','skin','nose','nose','nose','skin','skin','fang','fang','skin','skin','skin','blush','blush','skin','skinSh','outline','','','','','','','',''],
-
-        // Row 16-17: 下巴 + 脖子 + 爪痕暗示
-        ['','outline','outline','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','fang','fang','mouth','mouth','fang','fang','skin','skin','skin','skin','skin','skinSh','outline','outline','','','','','',''],
-        ['','','outline','outline','skinSh','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skinSh','skinSh','skinSh','outline','outline','','','','','','','',''],
-
-        // Row 18-19: 外套上部 + 毛皮边
-        ['','','','outline','outline','outline','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','outline','outline','outline','','','','','',''],
-        ['','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''],
-
-        // Row 20-23: 外套主体 + 毛皮纹理
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-
-        // Row 24-25: 外套下部 + 爪子
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','claw','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','claw','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-
-        // Row 26-27: 外套下摆
-        ['','outline','coatLn','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','coatLn','outline','','','','',''],
-        ['','','outline','outline','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','outline','outline','','','','','','','','',''],
-
-        // Row 28-29: 腿/裤子
-        ['','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','',''],
-        ['','','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','','','',''],
-
-        // Row 30-31: 鞋子
-        ['','','','','','','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','','','','','','','','','',''],
-        ['','','','','','','','','outline','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','outline','','','','','','','','','','','',''],
-      ],
-    } as PixelData,
+    id: 'echo',
+    name: '小野·回声',
+    hironoSeries: 'HIRONO - 共鸣',
+    palette: ECHO_PALETTE,
+    sprite: { width: 32, height: 32, pixels: ECHO_PIXELS },
   },
-
-  // ============================================================
-  // 15. GHOST 幽灵 — The Other One系列The Monster造型
-  // 怪物装扮，暗黑哥特，破碎感，深紫黑色调
-  // ============================================================
   {
-    id: 'ghost',
-    name: 'B-BABO幽灵',
-    hironoSeries: 'The Other One - The Monster',
-    palette: {
-      // 基础HIRONO色
-      hair:    '#3a2a4a',
-      hairHi:  '#5a4a6a',
-      hairDk:  '#2a1a38',
-      skin:    '#e0d8e8',
-      skinSh:  '#c8bcd8',
-      blush:   '#a878b8',
-      nose:    '#9868a8',
-      eyeW:    '#f0ecf4',
-      eyeI:    '#4a2a5a',
-      eyeB:    '#2a1a38',
-      lid:     '#d0c0dc',
-      lidSh:   '#b0a0c0',
-      mouth:   '#8868a0',
-      coat:    '#4a3a5a',
-      coatHi:  '#6a5a7a',
-      coatDk:  '#2e2038',
-      coatLn:  '#1e1428',
-      inner:   '#c0b0d0',
-      shoe:    '#2a1a38',
-      outline: '#140e1e',
-      white:   '#ffffff',
-      // 幽灵特有色
-      horn:    '#5a3a6a',
-      hornDk:  '#3a2048',
-      chain:   '#7a6a8a',
-      darkMist:'#2a1a3a',
-    },
-    sprite: {
-      width: 32,
-      height: 32,
-      pixels: [
-        // Row 0-2: 头顶 - 碎发 + 暗角
-        ['','','','','','','','hair','hair','hairDk','hairDk','hair','hair','','','hair','hair','hairDk','hairDk','hair','hair','','','','','','','','','','',''],
-        ['','','','','','hairDk','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairDk','hair','hair','','','','',''],
-        ['','','','hairDk','hair','hair','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hairHi','hairHi','hair','hair','hair','hair','hair','hair','hairDk','hairDk','','','',''],
-
-        // Row 3-5: 头发上部 + 额头
-        ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','','',''],
-        ['','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','outline','','',''],
-        ['','outline','hairDk','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hair','hairDk','hairDk','outline','','','',''],
-
-        // Row 6-7: 额头 + 眉毛区域
-        ['','outline','hairDk','hairDk','hair','hair','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','hair','hair','hairDk','hairDk','outline','','','',''],
-        ['','outline','hairDk','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','outline','','','','',''],
-
-        // Row 8-9: 浮肿眼皮（哥特暗沉）
-        ['','outline','skinSh','skin','skin','skin','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skin','skinSh','skinSh','outline','','','','',''],
-        ['outline','outline','skinSh','skin','skin','lidSh','lidSh','lidSh','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','lid','skin','skinSh','outline','outline','','','','',''],
-
-        // Row 10-11: 大眼睛（深紫瞳孔）
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skinSh','outline','','','','',''],
-        ['outline','skinSh','skin','eyeB','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skinSh','outline','','','','','',''],
-
-        // Row 12-13: 眼睛下部
-        ['outline','skinSh','skin','skin','eyeB','eyeB','eyeW','eyeW','eyeW','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeI','eyeW','eyeW','eyeW','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','',''],
-        ['','outline','skinSh','skin','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','eyeB','skin','skin','skin','skinSh','outline','','','','','',''],
-
-        // Row 14-15: 鼻子 + 嘴巴 + 腮红
-        ['','outline','skinSh','blush','blush','blush','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','blush','blush','blush','skin','skinSh','outline','','','','','','','',''],
-        ['','outline','skinSh','blush','blush','skin','skin','skin','skin','nose','nose','nose','skin','skin','skin','skin','skin','skin','skin','blush','blush','skin','skinSh','outline','','','','','','','',''],
-
-        // Row 16-17: 下巴 + 脖子 + 链条暗示
-        ['','outline','outline','skinSh','skin','skin','skin','skin','skin','skin','skin','skin','skin','skin','mouth','mouth','skin','skin','skin','skin','skin','skin','skin','skinSh','outline','outline','','','','','',''],
-        ['','','outline','outline','skinSh','skinSh','skin','skin','skin','skin','chain','chain','chain','skin','skin','skin','skin','skin','skin','skinSh','skinSh','skinSh','outline','outline','','','','','','','',''],
-
-        // Row 18-19: 哥特外套上部 + 暗角
-        ['','','','outline','outline','outline','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','outline','outline','outline','','','','','',''],
-        ['','','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','outline','','','','',''],
-
-        // Row 20-23: 哥特外套主体 + 暗雾纹理
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','outline','coatLn','coat','coat','coat','coat','coat','darkMist','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','',''],
-
-        // Row 24-25: 外套下部 + 破碎边缘
-        ['outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-        ['','outline','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','outline','','','','',''],
-
-        // Row 26-27: 外套下摆 + 暗雾
-        ['','outline','coatLn','coatLn','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coat','coatLn','coatLn','outline','','','','',''],
-        ['','','outline','outline','coatLn','darkMist','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','coatLn','darkMist','coatLn','outline','outline','','','','','','','',''],
-
-        // Row 28-29: 腿/裤子
-        ['','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','',''],
-        ['','','','','outline','outline','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','coatDk','outline','outline','','','','','','','','',''],
-
-        // Row 30-31: 鞋子
-        ['','','','','','','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','','','','','','','','','',''],
-        ['','','','','','','','','outline','outline','outline','shoe','shoe','shoe','shoe','shoe','shoe','outline','outline','outline','','','','','','','','','','','',''],
-      ],
-    } as PixelData,
+    id: 'vagrancy',
+    name: '小野·流浪',
+    hironoSeries: 'HIRONO - 漂泊',
+    palette: VAGRANCY_PALETTE,
+    sprite: { width: 32, height: 32, pixels: VAGRANCY_PIXELS },
   },
 ];

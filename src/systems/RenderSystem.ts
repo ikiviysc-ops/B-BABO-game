@@ -1,66 +1,75 @@
 /**
  * 渲染系统 - 将实体绘制到画布
+ *
+ * 渲染顺序：
+ * 1. 视差背景（最远 -> 中近，屏幕空间）
+ * 2. 瓦片地面（世界空间）
+ * 3. 地面装饰（世界空间）
+ * 4. 实体（玩家 + 敌人，世界空间）
  */
 
 import { Renderer } from '@engine/Renderer';
 import { Camera } from '@engine/Camera';
 import { EntityManager } from '@engine/EntityManager';
+import { TileMap } from '@engine/TileMap';
+import { ParallaxBackground } from '@engine/ParallaxBackground';
+import { drawCharacterShadow } from '@engine/VisualEnhancer';
 
 export class RenderSystem {
+  private readonly tileMap = new TileMap();
+  private readonly parallax = new ParallaxBackground();
+  private _time = 0;
+
   constructor(
     private readonly renderer: Renderer,
     private readonly camera: Camera,
   ) {}
 
-  update(entities: EntityManager): void {
+  update(entities: EntityManager, dt = 0): void {
     const ctx = this.renderer.ctx;
+    this._time += dt;
 
-    // 应用摄像机变换
+    // ─── 1. 视差背景（屏幕空间） ───────────────────────
+    this.parallax.draw(ctx, this.camera, this._time);
+
+    // ─── 2-4. 世界空间内容 ─────────────────────────────
     ctx.save();
+    ctx.imageSmoothingEnabled = false;
     ctx.translate(-Math.round(this.camera.x), -Math.round(this.camera.y));
 
-    // 绘制网格背景 (调试用)
-    this.drawGrid(ctx);
+    // 2. 瓦片地面
+    this.tileMap.draw(ctx, this.camera);
 
-    // 绘制所有实体
-    for (const entity of entities.getAll()) {
-      // 视锥剔除
-      if (this.isInView(entity)) {
-        this.renderer.drawSprite(
-          entity.sprite,
-          Math.round(entity.x - entity.width / 2),
-          Math.round(entity.y - entity.height / 2),
-        );
-      }
-    }
+    // 3. 地面装饰
+    this.parallax.drawGroundDecorations(ctx, this.camera);
+
+    // 4. 实体
+    this.drawEntities(entities);
 
     ctx.restore();
   }
 
-  /** 绘制背景网格 */
-  private drawGrid(ctx: CanvasRenderingContext2D): void {
-    const gridSize = 64;
-    const startX = Math.floor(this.camera.x / gridSize) * gridSize;
-    const startY = Math.floor(this.camera.y / gridSize) * gridSize;
-    const endX = startX + this.camera.width + gridSize;
-    const endY = startY + this.camera.height + gridSize;
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-    ctx.lineWidth = 1;
-
-    ctx.beginPath();
-    for (let x = startX; x <= endX; x += gridSize) {
-      ctx.moveTo(x, startY);
-      ctx.lineTo(x, endY);
+  /** 绘制所有实体（带视锥剔除） */
+  private drawEntities(entities: EntityManager): void {
+    const ctx = this.renderer.ctx;
+    for (const entity of entities.getAll()) {
+      if (this.isInView(entity)) {
+        const sx = Math.round(entity.x - entity.width / 2);
+        const sy = Math.round(entity.y - entity.height / 2);
+        const w = entity.width;
+        const h = entity.height;
+        // 角色阴影
+        drawCharacterShadow(ctx, sx, sy + h, w, false);
+        this.renderer.drawSprite(
+          entity.sprite,
+          sx,
+          sy,
+        );
+      }
     }
-    for (let y = startY; y <= endY; y += gridSize) {
-      ctx.moveTo(startX, y);
-      ctx.lineTo(endX, y);
-    }
-    ctx.stroke();
   }
 
-  /** 简单视锥剔除 */
+  /** 视锥剔除 */
   private isInView(entity: { x: number; y: number; width: number; height: number }): boolean {
     const hw = entity.width / 2;
     const hh = entity.height / 2;

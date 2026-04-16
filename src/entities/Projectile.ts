@@ -46,9 +46,13 @@ export interface ProjectileDef {
   /** 击退距离（像素） */
   knockback: number;
   /** 精灵图（可选，无则用默认渲染） */
-  sprite?: HTMLCanvasElement | OffscreenCanvas;
+  sprite?: HTMLCanvasElement;
   /** 所属阵营 */
   owner: 'player' | 'enemy';
+  /** 武器子类（用于渲染不同特效） */
+  weaponSubtype?: string;
+  /** 武器ID（精确区分每把武器） */
+  weaponId?: string;
 }
 
 /** 创建一个默认的投射物（用于对象池工厂） */
@@ -93,4 +97,6 @@ export function resetProjectile(proj: ProjectileDef): void {
   proj.knockback = 0;
   proj.sprite = undefined;
   proj.owner = 'player';
+  proj.weaponSubtype = undefined;
+  proj.weaponId = undefined;
 }

@@ -12,7 +12,6 @@ export class Renderer {
   constructor(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d', {
       alpha: false,
-      desynchronized: true,
     });
     if (!ctx) throw new Error('[Renderer] Cannot get 2D context');
     this.ctx = ctx;
@@ -47,7 +46,7 @@ export class Renderer {
 
   /** 绘制像素精灵到指定世界坐标 */
   drawSprite(
-    sprite: HTMLCanvasElement | OffscreenCanvas,
+    sprite: HTMLCanvasElement,
     x: number,
     y: number,
   ): void {

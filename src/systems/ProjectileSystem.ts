@@ -114,8 +114,8 @@ export class ProjectileSystem {
 
       // 4. 超时检查
       if (proj.age >= proj.lifetime) {
-        // 爆炸类型在超时时触发爆炸
-        if (proj.aoe > 0) {
+        // 只有非爆炸类型的投射物才触发爆炸（避免连锁爆炸）
+        if (proj.aoe > 0 && proj.type !== 'explosion') {
           this._triggerExplosion(proj);
         }
         proj.active = false;

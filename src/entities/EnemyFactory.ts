@@ -1,10 +1,11 @@
 /**
- * 敌人实体
+ * 敌人实体工厂
  */
 
 import { EntityManager, type Entity } from '@engine/EntityManager';
 import { renderPixelSprite } from '@engine/PixelRenderer';
 import { ENEMY_SPRITES, type EnemySprite } from '@data/enemies_sprites';
+import { EnemyAISystem, type EnemyAI } from '@systems/EnemyAISystem';
 
 /** 敌人属性 */
 export interface EnemyStats {
@@ -114,6 +115,30 @@ const ENEMY_DEFS: EnemyDef[] = [
 
 const defIndex = new Map(ENEMY_DEFS.map(d => [d.id, d]));
 
+/** 预缓存所有敌人sprite（启动时一次性创建） */
+const spriteCache = new Map<string, HTMLCanvasElement>();
+
+function getSprite(enemyId: string, scale: number): HTMLCanvasElement {
+  const key = `${enemyId}_${scale}`;
+  let sprite = spriteCache.get(key);
+  if (!sprite) {
+    const def = defIndex.get(enemyId);
+    if (def) {
+      sprite = renderPixelSprite(def.spriteData.sprite, def.spriteData.palette, scale);
+      spriteCache.set(key, sprite);
+    }
+  }
+  return sprite!;
+}
+
+/** 预热所有敌人sprite缓存 */
+export function warmupEnemySprites(scale = 3.5): void {
+  for (const def of ENEMY_DEFS) {
+    getSprite(def.id, scale);
+  }
+  console.log(`[EnemyFactory] Pre-cached ${spriteCache.size} enemy sprites`);
+}
+
 export class EnemyFactory {
   static getDef(id: string): EnemyDef | undefined {
     return defIndex.get(id);
@@ -123,15 +148,17 @@ export class EnemyFactory {
     return [...ENEMY_DEFS];
   }
 
-  /** 创建敌人实体 */
-  static createEnemy(enemyId: string, x: number, y: number, scale = 2): Entity & { enemyId: string; currentHp: number; maxHp: number; attackTimer: number } {
+  /** 创建敌人实体（含 FSM AI 字段） */
+  static createEnemy(
+    enemyId: string, x: number, y: number, scale = 3.5,
+  ): Entity & { enemyId: string; currentHp: number; maxHp: number; attackTimer: number; ai: EnemyAI } {
     const def = defIndex.get(enemyId);
     if (!def) {
       console.warn(`[EnemyFactory] Unknown enemy: ${enemyId}`);
       return EnemyFactory.createEnemy('rotting_rat', x, y, scale);
     }
 
-    const sprite = renderPixelSprite(def.spriteData.sprite, def.spriteData.palette, scale);
+    const sprite = getSprite(enemyId, scale);
     const size = 16 * scale;
 
     return {
@@ -146,6 +173,7 @@ export class EnemyFactory {
       currentHp: def.stats.hp,
       maxHp: def.stats.hp,
       attackTimer: 0,
+      ai: EnemyAISystem.createAI(def.id),
     };
   }
 }

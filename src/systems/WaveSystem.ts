@@ -47,6 +47,7 @@ export class WaveSystem {
   private _totalKills = 0;
   private _waveKills = 0;
   private _totalEnemiesThisWave = 0;
+  private readonly _maxAlive = 30; // 最大同屏怪物数
 
   get currentWave(): number { return this._currentWave; }
   get waveActive(): boolean { return this._waveActive; }
@@ -107,16 +108,17 @@ export class WaveSystem {
   update(dt: number, entities: EntityManager, playerX: number, playerY: number): void {
     if (!this._waveActive) return;
 
-    // 生成敌人
+    // 生成敌人（受最大同屏数限制）
     this._spawnTimer += dt;
-    if (this._spawnTimer >= this._spawnInterval && this._spawnQueue.length > 0) {
+    const aliveCount = entities.getAll().filter(e => 'enemyId' in e).length;
+    if (this._spawnTimer >= this._spawnInterval && this._spawnQueue.length > 0 && aliveCount < this._maxAlive) {
       this._spawnTimer = 0;
       const entry = this._spawnQueue.shift()!;
       const angle = Math.random() * Math.PI * 2;
-      const radius = 500 + Math.random() * 200;
+      const radius = 300 + Math.random() * 100;
       const x = playerX + Math.cos(angle) * radius;
       const y = playerY + Math.sin(angle) * radius;
-      const enemy = EnemyFactory.createEnemy(entry.id, x, y, 2);
+      const enemy = EnemyFactory.createEnemy(entry.id, x, y);
       entities.add(enemy);
     }
 
