@@ -389,15 +389,15 @@ export class Game {
     const sw = this.renderer.width;
     const sh = this.renderer.height;
 
-    // 强制重置
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    // 强制重置到DPR变换（所有UI用CSS像素坐标）
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
     ctx.imageSmoothingEnabled = false;
 
-    // 1. 清屏
-    this.renderer.clear();
-    this.renderer.fill('#0a0a1a');
+    // 1. 清屏（用CSS像素坐标，DPR变换会自动缩放）
+    ctx.fillStyle = '#0a0a1a';
+    ctx.fillRect(0, 0, sw, sh);
 
     if (this._phase === 'menu') {
       this.mainMenu.render(ctx, sw, sh, dpr);
