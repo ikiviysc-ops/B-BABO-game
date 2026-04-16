@@ -21,10 +21,9 @@ export class Renderer {
   resize(w?: number, h?: number): void {
     this._width = w ?? window.innerWidth;
     this._height = h ?? window.innerHeight;
-    this.canvas.width = this._width * this.dpr;
-    this.canvas.height = this._height * this.dpr;
-    this.canvas.style.width = this._width + 'px';
-    this.canvas.style.height = this._height + 'px';
+    this.canvas.width = Math.round(this._width * this.dpr);
+    this.canvas.height = Math.round(this._height * this.dpr);
+    // CSS由index.html控制(width:100%;height:100%)，不在这里覆盖
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     this.ctx.imageSmoothingEnabled = false;
   }
