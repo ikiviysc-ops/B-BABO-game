@@ -1070,6 +1070,10 @@ export class Game {
 
   // ==================== 辅助 ====================
 
+  onResize(): void {
+    this._onResize();
+  }
+
   private _onResize(): void {
     this.renderer.resize();
     this.camera.resize(this.renderer.width, this.renderer.height);

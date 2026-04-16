@@ -19,11 +19,13 @@ export class Renderer {
   get height(): number { return this._height; }
 
   resize(w?: number, h?: number): void {
-    // 使用document.documentElement获取真实视口（排除滚动条）
-    this._width = w ?? (document.documentElement.clientWidth || window.innerWidth);
-    this._height = h ?? (document.documentElement.clientHeight || window.innerHeight);
+    this._width = w ?? window.innerWidth;
+    this._height = h ?? window.innerHeight;
     this.canvas.width = Math.round(this._width * this.dpr);
     this.canvas.height = Math.round(this._height * this.dpr);
+    // 强制CSS尺寸匹配视口
+    this.canvas.style.width = this._width + 'px';
+    this.canvas.style.height = this._height + 'px';
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     this.ctx.imageSmoothingEnabled = false;
   }
