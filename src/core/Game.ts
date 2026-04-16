@@ -664,6 +664,15 @@ export class Game {
 
   private render(): void {
     this.camera.update();
+
+    // === 强制重置Canvas状态（防止context污染导致画面消失）===
+    const ctx = this.renderer.ctx;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.imageSmoothingEnabled = false;
+    // === 重置结束 ===
+
     this.renderer.clear();
 
     const dpr = window.devicePixelRatio || 1;
@@ -671,7 +680,6 @@ export class Game {
     const screenH = this.canvas.height;
 
     // FPS 显示（左下角）
-    const ctx = this.renderer.ctx;
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.font = `bold ${12 * dpr}px monospace`;
