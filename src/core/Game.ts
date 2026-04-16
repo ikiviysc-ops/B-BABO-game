@@ -392,7 +392,9 @@ export class Game {
 
     // === 升级选择状态 ===
     if (this.levelUpSystem.pendingLevelUp) {
+      console.log('[DEBUG] LevelUp pending! options:', this.levelUpSystem.options.length, 'panel visible:', this.levelUpPanel.visible);
       this.levelUpPanel.show();
+      console.log('[DEBUG] After show() panel visible:', this.levelUpPanel.visible);
       this.handleLevelUpInput();
       return;
     }
@@ -809,6 +811,7 @@ export class Game {
 
     // === 升级选择面板 ===
     if (this.levelUpSystem.pendingLevelUp) {
+      console.log('[DEBUG] Render levelUp panel, visible:', this.levelUpPanel.visible, 'options:', this.levelUpSystem.options.length);
       this.levelUpPanel.render(
         this.renderer.ctx,
         [...this.levelUpSystem.options],
