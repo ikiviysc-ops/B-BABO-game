@@ -1,60 +1,91 @@
-/**
- * 移动系统 - 处理玩家移动（键盘 + 虚拟摇杆）
- * 平滑加减速：加速、摩擦力减速、限速
- */
+// MovementSystem.ts - 玩家移动系统
 
-import { InputManager } from '@engine/InputManager';
-import { VirtualJoystick } from '@engine/VirtualJoystick';
-import { EntityManager } from '@engine/EntityManager';
+import type { Entity } from '../engine/EntityManager';
+import type { InputManager } from '../engine/InputManager';
+import type { VirtualJoystick } from '../engine/VirtualJoystick';
+
+export interface MovementConfig {
+  /** 地图边界(像素) */
+  bounds: { minX: number; minY: number; maxX: number; maxY: number };
+}
+
+const DEFAULT_BOUNDS: MovementConfig['bounds'] = {
+  minX: 0,
+  minY: 0,
+  maxX: 2000,
+  maxY: 2000,
+};
 
 export class MovementSystem {
-  private _velX = 0;
-  private _velY = 0;
-  private readonly _accel = 12;   // 加速度
-  private readonly _friction = 10; // 摩擦力（减速）
-  private readonly _maxSpeed = 300; // 最大速度
+  private bounds: MovementConfig['bounds'];
 
-  constructor(
-    private readonly input: InputManager,
-    private readonly joystick: VirtualJoystick,
-  ) {}
+  constructor(config?: Partial<MovementConfig>) {
+    this.bounds = { ...DEFAULT_BOUNDS, ...config?.bounds };
+  }
 
-  update(entities: EntityManager, dt: number): void {
-    const joy = this.joystick.getAxis();
-    const key = this.input.getMovementAxis();
+  /**
+   * 更新玩家移动
+   * @param entities 所有实体列表
+   * @param input 输入管理器
+   * @param joystick 虚拟摇杆
+   * @param dt 帧间隔(秒)
+   */
+  update(
+    entities: Entity[],
+    input: InputManager,
+    joystick: VirtualJoystick,
+    dt: number
+  ): void {
+    // 虚拟摇杆优先，键盘备选
+    const joyDir = joystick.getDirection();
+    let dx = joyDir.x;
+    let dy = joyDir.y;
 
-    const inputX = joy.x !== 0 ? joy.x : key.x;
-    const inputY = joy.y !== 0 ? joy.y : key.y;
-
-    // 加速
-    if (inputX !== 0 || inputY !== 0) {
-      this._velX += inputX * this._accel * 60 * dt;
-      this._velY += inputY * this._accel * 60 * dt;
+    if (dx === 0 && dy === 0) {
+      const keyDir = input.getMovementAxis();
+      dx = keyDir.x;
+      dy = keyDir.y;
     }
 
-    // 摩擦力减速
-    if (inputX === 0) {
-      this._velX *= Math.max(0, 1 - this._friction * dt);
-      if (Math.abs(this._velX) < 1) this._velX = 0;
-    }
-    if (inputY === 0) {
-      this._velY *= Math.max(0, 1 - this._friction * dt);
-      if (Math.abs(this._velY) < 1) this._velY = 0;
+    // 归一化(摇杆已归一化，但保险起见)
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len > 1) {
+      dx /= len;
+      dy /= len;
     }
 
-    // 限速
-    const speed = Math.sqrt(this._velX * this._velX + this._velY * this._velY);
-    if (speed > this._maxSpeed) {
-      this._velX = (this._velX / speed) * this._maxSpeed;
-      this._velY = (this._velY / speed) * this._maxSpeed;
-    }
+    for (const entity of entities) {
+      // 跳过非玩家实体
+      if (entity.id !== 'player') continue;
+      if (!entity.active) continue;
 
-    if (this._velX === 0 && this._velY === 0) return;
+      const speed = (entity.speed as number) ?? 200;
+      const x = entity.x as number;
+      const y = entity.y as number;
+      const size = (entity.size as number) ?? 16;
 
-    for (const entity of entities.getAll()) {
-      if ('enemyId' in entity) continue;
-      entity.x += this._velX * dt;
-      entity.y += this._velY * dt;
+      let newX = x + dx * speed * dt;
+      let newY = y + dy * speed * dt;
+
+      // 边界限制
+      newX = Math.max(this.bounds.minX + size, Math.min(this.bounds.maxX - size, newX));
+      newY = Math.max(this.bounds.minY + size, Math.min(this.bounds.maxY - size, newY));
+
+      entity.x = newX;
+      entity.y = newY;
+
+      // 记录朝向
+      if (dx !== 0 || dy !== 0) {
+        entity.facingX = dx;
+        entity.facingY = dy;
+      }
     }
+  }
+
+  /**
+   * 更新边界
+   */
+  setBounds(bounds: Partial<MovementConfig['bounds']>): void {
+    this.bounds = { ...this.bounds, ...bounds };
   }
 }

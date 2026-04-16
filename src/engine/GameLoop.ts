@@ -1,92 +1,67 @@
-/**
- * 固定时间步长游戏循环
- *
- * - 错误捕获：update/render异常不会崩溃循环
- * - FPS监控
- */
+// GameLoop.ts - 固定60fps游戏循环，累加器模式
+
+export type UpdateFn = (dt: number) => void;
+export type RenderFn = () => void;
 
 export class GameLoop {
-  private readonly _fixedDt: number;
-  private readonly _updateFn: (dt: number) => void;
-  private readonly _renderFn: () => void;
-  private _running = false;
-  private _lastTime = 0;
-  private _accumulator = 0;
-  private _rafId = 0;
+  private updateFn: UpdateFn;
+  private renderFn: RenderFn;
+  private readonly fixedDt = 1 / 60;
+  private accumulator = 0;
+  private lastTime = 0;
+  private rafId = 0;
+  private running = false;
 
-  // FPS
-  private _fpsFrames = 0;
-  private _fpsAccTime = 0;
-  private _currentFps = 60;
+  // FPS监控
+  private fpsFrames = 0;
+  private fpsAccum = 0;
+  public fps = 60;
 
-  get fps(): number { return this._currentFps; }
-
-  constructor(
-    fixedFps: number,
-    updateFn: (dt: number) => void,
-    renderFn: () => void,
-  ) {
-    this._fixedDt = 1 / fixedFps;
-    this._updateFn = updateFn;
-    this._renderFn = renderFn;
+  constructor(update: UpdateFn, render: RenderFn) {
+    this.updateFn = update;
+    this.renderFn = render;
   }
 
   start(): void {
-    if (this._running) return;
-    this._running = true;
-    this._lastTime = performance.now();
-    this._accumulator = 0;
-    this.tick(this._lastTime);
+    if (this.running) return;
+    this.running = true;
+    this.lastTime = performance.now();
+    this.loop(this.lastTime);
   }
 
   stop(): void {
-    this._running = false;
-    if (this._rafId) cancelAnimationFrame(this._rafId);
+    this.running = false;
+    if (this.rafId) cancelAnimationFrame(this.rafId);
   }
 
-  private tick(now: number): void {
-    if (!this._running) return;
+  private loop = (now: number): void => {
+    if (!this.running) return;
+    this.rafId = requestAnimationFrame(this.loop);
 
-    try {
-      let frameTime = (now - this._lastTime) / 1000;
-      this._lastTime = now;
-      if (frameTime > 0.25) frameTime = 0.25;
-      this._accumulator += frameTime;
+    const elapsed = (now - this.lastTime) / 1000;
+    this.lastTime = now;
 
-      // 逻辑更新（防死亡螺旋）
-      let steps = 0;
-      while (this._accumulator >= this._fixedDt && steps < 4) {
-        try {
-          this._updateFn(this._fixedDt);
-        } catch (e) {
-          console.error('[GameLoop] update error:', e);
-        }
-        this._accumulator -= this._fixedDt;
-        steps++;
-      }
-      if (this._accumulator > this._fixedDt * 2) {
-        this._accumulator = 0;
-      }
+    // 防止大跳帧（如切标签页回来）
+    const clamped = Math.min(elapsed, 0.1);
+    this.accumulator += clamped;
 
-      // 渲染
-      try {
-        this._renderFn();
-      } catch (e) {
-        console.error('[GameLoop] render error:', e);
-      }
-
-      // FPS
-      this._fpsFrames++;
-      this._fpsAccTime += frameTime;
-      if (this._fpsAccTime >= 1.0) {
-        this._currentFps = this._fpsFrames;
-        this._fpsFrames = 0;
-        this._fpsAccTime -= 1.0;
-      }
-    } catch (e) {
-      console.error('[GameLoop] tick error:', e);
+    // FPS统计
+    this.fpsAccum += clamped;
+    this.fpsFrames++;
+    if (this.fpsAccum >= 0.5) {
+      this.fps = Math.round(this.fpsFrames / this.fpsAccum);
+      this.fpsFrames = 0;
+      this.fpsAccum = 0;
     }
 
-    this._rafId = requestAnimationFrame((t) => this.tick(t));
-  }
+    try {
+      while (this.accumulator >= this.fixedDt) {
+        this.updateFn(this.fixedDt);
+        this.accumulator -= this.fixedDt;
+      }
+      this.renderFn();
+    } catch (e) {
+      console.error('[GameLoop] Error:', e);
+    }
+  };
 }

@@ -1,359 +1,250 @@
-/**
- * B-BABO 角色注册表 — 20 个 POP MART HIRONO 风格角色
- *
- * 每个角色对应一个 HIRONO 小野系列情绪主题，具有独特的视觉差异和技能。
- * HIRONO 风格核心：大头小身、圆润无棱角、豆豆眼/十字星瞳、红腮红+红鼻头、马卡龙色系
- */
+// CharacterRegistry.ts - 20角色注册表
 
-import type { PixelData } from '@engine/PixelRenderer';
-import { renderPixelSprite } from '@engine/PixelRenderer';
-import { EntityManager, type Entity } from '@engine/EntityManager';
+import { CharacterPalette, CHARACTER_PALETTES, generateSprite } from './BaboSprite';
 
-/** 角色精灵定义 */
-export interface CharacterSprite {
-  readonly id: string;
-  readonly name: string;
-  readonly hironoSeries: string;
-  readonly palette: Record<string, string>;
-  readonly sprite: PixelData;
-}
-
-/** 角色属性定义 */
 export interface CharacterStats {
-  readonly hp: number;
-  readonly speed: number;
-  readonly pickupRange: number;
-  readonly armor: number;
-  readonly critRate: number;
+  hp: number;
+  speed: number;
+  armor: number;
+  crit: number;
 }
 
-/** 完整角色定义 */
+export interface PassiveSkill {
+  name: string;
+  desc: string;
+  effect: string; // 标识符，供系统使用
+}
+
 export interface CharacterDef {
-  readonly id: string;
-  readonly name: string;
-  readonly stats: CharacterStats;
-  readonly passive: string;
-  readonly active: string;
-  readonly activeCd: number;
-  readonly initialWeapon: string;
-  readonly unlockCondition: string;
-  readonly unlocked: boolean;
+  id: string;
+  name: string;
+  nameEn: string;
+  emotion: string;
+  stats: CharacterStats;
+  passive: PassiveSkill;
+  initialWeapon: string;
+  unlockCondition?: string;
 }
 
-// ============================================================
-// 导入 4 批次精灵数据
-// ============================================================
-import { SPRITES_BATCH_1 } from '@data/sprites_batch1';
-import { SPRITES_BATCH_2 } from '@data/sprites_batch2';
-import { SPRITES_BATCH_3 } from '@data/sprites_batch3';
-import { SPRITES_BATCH_4 } from '@data/sprites_batch4';
+export interface CharacterSprite {
+  palette: CharacterPalette;
+  pixels: string[][];
+}
 
-/** 全部 20 个角色精灵 */
-const ALL_SPRITES: CharacterSprite[] = [
-  ...SPRITES_BATCH_1,
-  ...SPRITES_BATCH_2,
-  ...SPRITES_BATCH_3,
-  ...SPRITES_BATCH_4,
-].map(s => ({
-  ...s,
-  palette: Object.fromEntries(
-    Object.entries(s.palette).filter(([, v]) => v !== undefined),
-  ),
-}));
+// ==================== 20角色完整定义 ====================
 
-/** 精灵索引 (id -> CharacterSprite) */
-const spriteIndex = new Map<string, CharacterSprite>();
-for (const s of ALL_SPRITES) spriteIndex.set(s.id, s);
-
-// ============================================================
-// 角色属性 & 技能定义 — 20 个 HIRONO 情绪主题角色
-// ============================================================
 const CHARACTER_DEFS: CharacterDef[] = [
-  // --- 初始角色 (4个) ---
   {
-    id: 'amnesia',
-    name: '小野·失忆',
-    stats: { hp: 100, speed: 200, pickupRange: 55, armor: 2, critRate: 0.05 },
-    passive: '空白画布：获得的经验值+10%',
-    active: '记忆碎片：释放空白画笔之力，对周围敌人造成200%伤害并清除所有负面效果',
-    activeCd: 10,
-    initialWeapon: '空白画笔',
-    unlockCondition: '默认解锁',
-    unlocked: true,
+    id: 'babo', name: 'BABO', nameEn: 'Babo', emotion: 'curious',
+    stats: { hp: 100, speed: 200, armor: 0, crit: 5 },
+    passive: { name: '好奇心', desc: '经验获取+15%', effect: 'xp_boost_15' },
+    initialWeapon: 'fist',
   },
   {
-    id: 'raving',
-    name: '小野·狂啸',
-    stats: { hp: 110, speed: 220, pickupRange: 50, armor: 3, critRate: 0.08 },
-    passive: '怒火中烧：所有伤害+10%',
-    active: '声波呐喊：发出震耳欲聋的怒吼，对前方扇形区域造成300%伤害并击退敌人',
-    activeCd: 8,
-    initialWeapon: '声波呐喊',
-    unlockCondition: '默认解锁',
-    unlocked: true,
+    id: 'nabi', name: 'NABI', nameEn: 'Nabi', emotion: 'playful',
+    stats: { hp: 90, speed: 230, armor: 0, crit: 10 },
+    passive: { name: '猫之敏捷', desc: '闪避率+10%', effect: 'dodge_10' },
+    initialWeapon: 'claw',
+    unlockCondition: '击败100个敌人',
   },
   {
-    id: 'floating',
-    name: '小野·漂浮',
-    stats: { hp: 85, speed: 260, pickupRange: 60, armor: 1, critRate: 0.06 },
-    passive: '轻盈如风：移动速度+20%',
-    active: '气泡屏障：释放一圈气泡弹，对周围敌人造成150%伤害并短暂减速',
-    activeCd: 7,
-    initialWeapon: '气泡弹',
-    unlockCondition: '默认解锁',
-    unlocked: true,
+    id: 'doki', name: 'DOKI', nameEn: 'Doki', emotion: 'brave',
+    stats: { hp: 120, speed: 180, armor: 5, crit: 8 },
+    passive: { name: '勇气', desc: '生命低于30%时伤害+25%', effect: 'low_hp_dmg_25' },
+    initialWeapon: 'sword',
   },
   {
-    id: 'destroyer',
-    name: '小野·毁灭',
-    stats: { hp: 130, speed: 180, pickupRange: 45, armor: 6, critRate: 0.07 },
-    passive: '毁灭之力：近战伤害+15%',
-    active: '碎裂冲击：蓄力后释放碎裂拳套，对前方大范围造成350%伤害',
-    activeCd: 12,
-    initialWeapon: '碎裂拳套',
-    unlockCondition: '默认解锁',
-    unlocked: true,
-  },
-
-  // --- 解锁角色 (16个) ---
-  {
-    id: 'ghost_hirono',
-    name: '小野·幽灵',
-    stats: { hp: 75, speed: 240, pickupRange: 55, armor: 0, critRate: 0.08 },
-    passive: '灵魂不灭：死亡时自动复活1次，恢复50%生命值',
-    active: '灵魂灯笼：召唤灵魂灯笼，持续5秒对周围敌人造成每秒80%伤害',
-    activeCd: 15,
-    initialWeapon: '灵魂灯笼',
-    unlockCondition: '累计死亡10次',
-    unlocked: false,
+    id: 'chaka', name: 'CHAKA', nameEn: 'Chaka', emotion: 'calm',
+    stats: { hp: 95, speed: 210, armor: 3, crit: 12 },
+    passive: { name: '隐匿', desc: '暴击伤害+30%', effect: 'crit_dmg_30' },
+    initialWeapon: 'shuriken',
+    unlockCondition: '存活超过10分钟',
   },
   {
-    id: 'healer',
-    name: '小野·治愈',
-    stats: { hp: 100, speed: 190, pickupRange: 60, armor: 2, critRate: 0.05 },
-    passive: '温暖之心：每秒自动恢复0.5HP',
-    active: '治愈之花：在脚下绽放治愈之花，3秒内恢复30%最大生命值',
-    activeCd: 12,
-    initialWeapon: '治愈之花',
-    unlockCondition: '累计使用治疗道具20次',
-    unlocked: false,
+    id: 'pudding', name: 'PUDDING', nameEn: 'Pudding', emotion: 'happy',
+    stats: { hp: 130, speed: 170, armor: 8, crit: 3 },
+    passive: { name: '弹性', desc: '受到伤害减少10%', effect: 'dmg_reduce_10' },
+    initialWeapon: 'bat',
+    unlockCondition: '达到5级',
   },
   {
-    id: 'marionette',
-    name: '小野·木偶',
-    stats: { hp: 90, speed: 200, pickupRange: 55, armor: 2, critRate: 0.06 },
-    passive: '丝线操控：所有投射物数量+1',
-    active: '操控丝线：释放丝线连接周围最多5个敌人，3秒内造成持续伤害',
-    activeCd: 14,
-    initialWeapon: '操控丝线',
-    unlockCondition: '累计发射投射物1000次',
-    unlocked: false,
+    id: 'mochi', name: 'MOCHI', nameEn: 'Mochi', emotion: 'sleepy',
+    stats: { hp: 110, speed: 190, armor: 2, crit: 7 },
+    passive: { name: '治愈光环', desc: '每秒恢复0.5%最大生命', effect: 'regen_05' },
+    initialWeapon: 'wand',
+    unlockCondition: '使用治疗道具20次',
   },
   {
-    id: 'fox',
-    name: '小野·狐狸',
-    stats: { hp: 95, speed: 230, pickupRange: 65, armor: 2, critRate: 0.10 },
-    passive: '狡黠之幸：幸运+20%，稀有掉落率提升',
-    active: '狐火：释放3团狐火追踪最近敌人，每团造成200%伤害',
-    activeCd: 9,
-    initialWeapon: '狐火',
-    unlockCondition: '累计拾取50个稀有道具',
-    unlocked: false,
+    id: 'thunder', name: 'THUNDER', nameEn: 'Thunder', emotion: 'excited',
+    stats: { hp: 85, speed: 240, armor: 0, crit: 15 },
+    passive: { name: '雷电', desc: '攻击有20%几率连锁1个额外目标', effect: 'chain_20' },
+    initialWeapon: 'thunder_spear',
+    unlockCondition: '击败Boss',
   },
   {
-    id: 'crow',
-    name: '小野·乌鸦',
-    stats: { hp: 90, speed: 210, pickupRange: 50, armor: 3, critRate: 0.09 },
-    passive: '深沉之力：所有技能冷却时间-10%',
-    active: '黑羽刃：向四周释放黑羽刃，每个造成180%伤害',
-    activeCd: 8,
-    initialWeapon: '黑羽刃',
-    unlockCondition: '累计使用主动技能50次',
-    unlocked: false,
+    id: 'luna', name: 'LUNA', nameEn: 'Luna', emotion: 'mysterious',
+    stats: { hp: 90, speed: 200, armor: 3, crit: 10 },
+    passive: { name: '月光', desc: '夜间伤害+20%', effect: 'night_dmg_20' },
+    initialWeapon: 'moon_blade',
+    unlockCondition: '收集50个月光碎片',
   },
   {
-    id: 'pianist',
-    name: '小野·钢琴家',
-    stats: { hp: 95, speed: 195, pickupRange: 55, armor: 2, critRate: 0.06 },
-    passive: '艺术永恒：所有持续效果时间+20%',
-    active: '音符飞刃：释放一排音符飞刃，对直线敌人造成250%伤害',
-    activeCd: 10,
-    initialWeapon: '音符飞刃',
-    unlockCondition: '累计装备5种不同武器',
-    unlocked: false,
+    id: 'blaze', name: 'BLAZE', nameEn: 'Blaze', emotion: 'angry',
+    stats: { hp: 95, speed: 220, armor: 2, crit: 12 },
+    passive: { name: '燃烧', desc: '攻击附带3秒灼烧(每秒5伤害)', effect: 'burn_3s' },
+    initialWeapon: 'fire_staff',
+    unlockCondition: '累计造成1000点火焰伤害',
   },
   {
-    id: 'fallen_angel',
-    name: '小野·堕落天使',
-    stats: { hp: 120, speed: 220, pickupRange: 55, armor: 4, critRate: 0.10 },
-    passive: '堕落之力：所有伤害+20%',
-    active: '断翼之刃：释放断翼之力，对前方大范围造成400%伤害',
-    activeCd: 16,
-    initialWeapon: '断翼之刃',
-    unlockCondition: '累计击杀1000个敌人',
-    unlocked: false,
+    id: 'frost', name: 'FROST', nameEn: 'Frost', emotion: 'cold',
+    stats: { hp: 100, speed: 195, armor: 5, crit: 8 },
+    passive: { name: '冰冻', desc: '攻击有15%几率冻结敌人1秒', effect: 'freeze_15' },
+    initialWeapon: 'ice_bow',
+    unlockCondition: '冻结50个敌人',
   },
   {
-    id: 'monster',
-    name: '小野·怪物',
-    stats: { hp: 110, speed: 185, pickupRange: 50, armor: 3, critRate: 0.07 },
-    passive: '黑暗领域：所有攻击范围+30%',
-    active: '暗影触手：召唤暗影触手攻击周围敌人，持续4秒',
-    activeCd: 14,
-    initialWeapon: '暗影触手',
-    unlockCondition: '单局存活超过20分钟',
-    unlocked: false,
+    id: 'shadow', name: 'SHADOW', nameEn: 'Shadow', emotion: 'dark',
+    stats: { hp: 80, speed: 250, armor: 1, crit: 20 },
+    passive: { name: '暗影步', desc: '击杀后2秒内移速+50%', effect: 'kill_speed_50' },
+    initialWeapon: 'shadow_dagger',
+    unlockCondition: '累计击杀500个敌人',
   },
   {
-    id: 'insight',
-    name: '小野·洞察',
-    stats: { hp: 100, speed: 200, pickupRange: 70, armor: 2, critRate: 0.06 },
-    passive: '全视之眼：拾取范围+25%',
-    active: '全视之眼：开启全视之眼，5秒内显示所有掉落物位置并自动拾取',
-    activeCd: 12,
-    initialWeapon: '全视之眼',
-    unlockCondition: '累计拾取经验宝石5000个',
-    unlocked: false,
+    id: 'cotton', name: 'COTTON', nameEn: 'Cotton', emotion: 'soft',
+    stats: { hp: 140, speed: 160, armor: 10, crit: 2 },
+    passive: { name: '棉花护盾', desc: '每30秒获得一层护盾(吸收10伤害)', effect: 'shield_10_30s' },
+    initialWeapon: 'cotton_cannon',
+    unlockCondition: '承受1000点伤害',
   },
   {
-    id: 'echo',
-    name: '小野·回声',
-    stats: { hp: 95, speed: 205, pickupRange: 55, armor: 2, critRate: 0.07 },
-    passive: '共鸣之力：投射物有5%概率反弹',
-    active: '回声定位：释放回声波，标记所有敌人位置，3秒内对标记敌人造成额外伤害',
-    activeCd: 10,
-    initialWeapon: '回声定位',
-    unlockCondition: '累计反弹投射物50次',
-    unlocked: false,
+    id: 'rock', name: 'ROCK', nameEn: 'Rock', emotion: 'stubborn',
+    stats: { hp: 160, speed: 150, armor: 15, crit: 3 },
+    passive: { name: '岩石体质', desc: '护甲值额外+5', effect: 'armor_5' },
+    initialWeapon: 'hammer',
+    unlockCondition: '达到10级',
   },
   {
-    id: 'vagrancy',
-    name: '小野·流浪',
-    stats: { hp: 90, speed: 270, pickupRange: 60, armor: 1, critRate: 0.06 },
-    passive: '漂泊之心：移动速度+30%',
-    active: '旅人之杖：挥动旅人之杖，释放冲击波对周围敌人造成200%伤害',
-    activeCd: 8,
-    initialWeapon: '旅人之杖',
-    unlockCondition: '累计移动距离达到100000',
-    unlocked: false,
+    id: 'spirit', name: 'SPIRIT', nameEn: 'Spirit', emotion: 'ethereal',
+    stats: { hp: 75, speed: 260, armor: 0, crit: 15 },
+    passive: { name: '灵魂穿透', desc: '投射物穿透+1', effect: 'pierce_1' },
+    initialWeapon: 'spirit_orb',
+    unlockCondition: '使用魔法武器击杀200个敌人',
   },
   {
-    id: 'manacle',
-    name: '小野·枷锁',
-    stats: { hp: 115, speed: 185, pickupRange: 50, armor: 5, critRate: 0.06 },
-    passive: '挣扎反击：受到攻击时10%概率减速攻击者',
-    active: '锁链鞭：释放锁链鞭，对前方直线敌人造成250%伤害并束缚2秒',
-    activeCd: 12,
-    initialWeapon: '锁链鞭',
-    unlockCondition: '累计承受伤害达到50000',
-    unlocked: false,
+    id: 'berry', name: 'BERRY', nameEn: 'Berry', emotion: 'sweet',
+    stats: { hp: 95, speed: 200, armor: 3, crit: 10 },
+    passive: { name: '莓果能量', desc: '拾取道具时恢复5HP', effect: 'pickup_heal_5' },
+    initialWeapon: 'berry_bomb',
+    unlockCondition: '拾取100个道具',
   },
   {
-    id: 'birdman',
-    name: '小野·鸟人',
-    stats: { hp: 95, speed: 230, pickupRange: 55, armor: 2, critRate: 0.08 },
-    passive: '超越之翼：投射物飞行速度+40%',
-    active: '羽箭：向最近敌人连射5支羽箭，每支造成180%伤害',
-    activeCd: 9,
-    initialWeapon: '羽箭',
-    unlockCondition: '累计击杀500个飞行敌人',
-    unlocked: false,
+    id: 'pixel', name: 'PIXEL', nameEn: 'Pixel', emotion: 'retro',
+    stats: { hp: 100, speed: 200, armor: 2, crit: 8 },
+    passive: { name: '像素化', desc: '攻击速度+15%', effect: 'atk_speed_15' },
+    initialWeapon: 'pixel_gun',
+    unlockCondition: '游玩时间超过1小时',
   },
   {
-    id: 'numb',
-    name: '小野·麻木',
-    stats: { hp: 130, speed: 170, pickupRange: 60, armor: 4, critRate: 0.04 },
-    passive: '逃避现实：造成的伤害-20%，但受到的伤害-30%',
-    active: '梦境棉花：释放梦境棉花，使周围敌人陷入沉睡3秒',
-    activeCd: 15,
-    initialWeapon: '梦境棉花',
-    unlockCondition: '单局中受到伤害0次存活5分钟',
-    unlocked: false,
+    id: 'nova', name: 'NOVA', nameEn: 'Nova', emotion: 'radiant',
+    stats: { hp: 90, speed: 210, armor: 4, crit: 12 },
+    passive: { name: '超新星', desc: '每第10次攻击造成AOE爆炸', effect: 'aoe_every_10' },
+    initialWeapon: 'star_blaster',
+    unlockCondition: '达到15级',
   },
   {
-    id: 'dreaming',
-    name: '小野·做梦',
-    stats: { hp: 100, speed: 210, pickupRange: 58, armor: 3, critRate: 0.07 },
-    passive: '希望之光：全属性+5%（HP/速度/伤害/护甲）',
-    active: '星光瀑布：召唤星光瀑布覆盖大范围区域，持续4秒造成每秒150%伤害',
-    activeCd: 16,
-    initialWeapon: '星光瀑布',
-    unlockCondition: '解锁其他15个角色',
-    unlocked: false,
+    id: 'storm', name: 'STORM', nameEn: 'Storm', emotion: 'fierce',
+    stats: { hp: 105, speed: 215, armor: 6, crit: 10 },
+    passive: { name: '风暴', desc: '周围敌人持续受到每秒3点伤害', effect: 'aura_dmg_3' },
+    initialWeapon: 'storm_ring',
+    unlockCondition: '存活超过20分钟',
   },
   {
-    id: 'the_other',
-    name: '小野·他者',
-    stats: { hp: 100, speed: 200, pickupRange: 55, armor: 3, critRate: 0.07 },
-    passive: '镜像分身：自动生成一个分身，分身造成50%伤害',
-    active: '镜像分身：强化分身，5秒内分身造成100%伤害并可独立行动',
-    activeCd: 18,
-    initialWeapon: '镜像分身',
-    unlockCondition: '在地狱难度下击败Boss',
-    unlocked: false,
+    id: 'honey', name: 'HONEY', nameEn: 'Honey', emotion: 'warm',
+    stats: { hp: 120, speed: 185, armor: 7, crit: 5 },
+    passive: { name: '甜蜜', desc: '队友(召唤物)伤害+20%', effect: 'summon_dmg_20' },
+    initialWeapon: 'honey_pot',
+    unlockCondition: '召唤10个友方单位',
+  },
+  {
+    id: 'cosmic', name: 'COSMIC', nameEn: 'Cosmic', emotion: 'infinite',
+    stats: { hp: 88, speed: 235, armor: 3, crit: 18 },
+    passive: { name: '宇宙之力', desc: '所有属性随时间缓慢增长(每分钟+1%)', effect: 'scaling_1_min' },
+    initialWeapon: 'cosmic_ray',
+    unlockCondition: '通关一次游戏',
   },
 ];
 
-/** 角色属性索引 (id -> CharacterDef) */
-const defIndex = new Map<string, CharacterDef>();
-for (const d of CHARACTER_DEFS) defIndex.set(d.id, d);
+// ==================== 注册表方法 ====================
 
-// ============================================================
-// 公开 API
-// ============================================================
+const defMap = new Map<string, CharacterDef>();
+const spriteCache = new Map<string, CharacterSprite>();
 
-export class CharacterRegistry {
-  /** 获取角色精灵定义 */
-  static getSprite(id: string): CharacterSprite | undefined {
-    return spriteIndex.get(id);
-  }
+for (const def of CHARACTER_DEFS) {
+  defMap.set(def.id, def);
+}
 
-  /** 获取角色属性定义 */
-  static getDef(id: string): CharacterDef | undefined {
-    return defIndex.get(id);
-  }
+/**
+ * 获取角色定义
+ */
+export function getDef(id: string): CharacterDef | undefined {
+  return defMap.get(id);
+}
 
-  /** 获取所有角色定义 */
-  static getAllDefs(): CharacterDef[] {
-    return [...CHARACTER_DEFS];
-  }
+/**
+ * 获取角色精灵数据(带缓存)
+ */
+export function getSprite(id: string): CharacterSprite | undefined {
+  if (spriteCache.has(id)) return spriteCache.get(id);
+  const palette = CHARACTER_PALETTES[id];
+  if (!palette) return undefined;
+  const sprite: CharacterSprite = {
+    palette,
+    pixels: generateSprite(palette),
+  };
+  spriteCache.set(id, sprite);
+  return sprite;
+}
 
-  /** 获取已解锁角色 */
-  static getUnlockedDefs(): CharacterDef[] {
-    return CHARACTER_DEFS.filter(d => d.unlocked);
-  }
+/**
+ * 获取所有角色ID
+ */
+export function getAllIds(): string[] {
+  return CHARACTER_DEFS.map(d => d.id);
+}
 
-  /** 创建角色实体 */
-  static createEntity(charId: string, scale = 3): Entity {
-    const spriteData = spriteIndex.get(charId);
-    const def = defIndex.get(charId);
+/**
+ * 渲染角色到Canvas (简化版)
+ * @param ctx Canvas上下文
+ * @param id 角色ID
+ * @param x 渲染位置X
+ * @param y 渲染位置Y
+ * @param scale 缩放倍数
+ */
+export function renderCharacter(
+  ctx: CanvasRenderingContext2D,
+  id: string,
+  x: number,
+  y: number,
+  scale: number = 2
+): void {
+  const sprite = getSprite(id);
+  if (!sprite) return;
 
-    if (!spriteData || !def) {
-      console.warn(`[CharacterRegistry] Unknown character: ${charId}, using amnesia`);
-      return CharacterRegistry.createEntity('amnesia', scale);
+  const pixelSize = scale;
+
+  for (let row = 0; row < 32; row++) {
+    for (let col = 0; col < 32; col++) {
+      const color = sprite.pixels[row][col];
+      if (color === 'transparent') continue;
+      ctx.fillStyle = color;
+      ctx.fillRect(
+        x + col * pixelSize,
+        y + row * pixelSize,
+        pixelSize,
+        pixelSize
+      );
     }
-
-    const sprite = renderPixelSprite(spriteData.sprite, spriteData.palette, scale);
-
-    return {
-      id: EntityManager.nextId(),
-      x: 500,
-      y: 500,
-      width: 32 * scale,
-      height: 32 * scale,
-      sprite,
-      active: true,
-      speed: def.stats.speed,
-    };
-  }
-
-  /** 获取角色总数 */
-  static get totalCharacters(): number {
-    return CHARACTER_DEFS.length;
-  }
-
-  /** 获取已解锁数量 */
-  static get unlockedCount(): number {
-    return CHARACTER_DEFS.filter(d => d.unlocked).length;
   }
 }
+
+export { CHARACTER_DEFS };

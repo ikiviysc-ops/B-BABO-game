@@ -1,43 +1,44 @@
-/**
- * 屏幕震动系统
- * 参考知识库：轻攻击(2px,100ms) / 重攻击(8px,300ms) / 爆炸(15px,500ms)
- */
+// ScreenShake.ts - 屏幕震动
 
 export class ScreenShake {
-  private offsetX = 0;
-  private offsetY = 0;
   private intensity = 0;
   private duration = 0;
-  private timer = 0;
   private frequency = 30;
-  private _active = false;
+  private timer = 0;
+  private time = 0;
+  private _offsetX = 0;
+  private _offsetY = 0;
 
-  get active(): boolean { return this._active; }
+  get offsetX(): number { return this._offsetX; }
+  get offsetY(): number { return this._offsetY; }
 
-  trigger(intensity: number, duration: number, frequency = 30): void {
+  trigger(intensity: number, duration: number, frequency: number = 30): void {
     this.intensity = intensity;
     this.duration = duration;
     this.frequency = frequency;
-    this.timer = 0;
-    this._active = true;
+    this.timer = duration;
+    this.time = 0;
   }
 
   update(dt: number): void {
-    if (!this._active) return;
-    this.timer += dt;
-    if (this.timer >= this.duration) {
-      this.offsetX = 0;
-      this.offsetY = 0;
-      this._active = false;
+    if (this.timer <= 0) {
+      this._offsetX = 0;
+      this._offsetY = 0;
       return;
     }
+
+    this.timer -= dt;
+    this.time += dt;
+
     const progress = this.timer / this.duration;
-    const current = this.intensity * (1 - progress);
-    this.offsetX = Math.sin(this.timer * this.frequency * 0.01) * current;
-    this.offsetY = Math.cos(this.timer * this.frequency * 0.013) * current;
+    const decay = progress * this.intensity;
+    const t = this.time * this.frequency * Math.PI * 2;
+
+    this._offsetX = Math.sin(t * 1.1) * decay;
+    this._offsetY = Math.cos(t * 0.9) * decay;
   }
 
   getOffset(): { x: number; y: number } {
-    return { x: this.offsetX, y: this.offsetY };
+    return { x: this._offsetX, y: this._offsetY };
   }
 }

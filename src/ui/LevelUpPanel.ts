@@ -1,185 +1,232 @@
-/**
- * 升级选择面板 — 专业卡片式选择界面
- * 特性：稀有度颜色、弹入动画、属性变化预览
- */
+// LevelUpPanel.ts - 升级选择面板
 
-import { UI, CARD, duration, easing } from '@engine/UITheme';
-import { UITextRenderer } from '@engine/UITextRenderer';
-import { getPixelIcon, getIconIdForOption } from '@engine/PixelIcons';
-import type { LevelUpOption } from '@systems/LevelUpSystem';
+import { COLORS, CARD, FONT, RARITY } from '../engine/UITheme';
+import { UITextRenderer } from '../engine/UITextRenderer';
+import type { LevelUpOption } from '../systems/LevelUpSystem';
 
 export class LevelUpPanel {
   private text: UITextRenderer;
-  private dpr: number;
-  private animTimer = 0;
-  private animDuration = duration.slow;
-  private _visible = false;
 
-  get visible(): boolean { return this._visible; }
-  show(): void { this._visible = true; this.animTimer = 0; }
-  hide(): void { this._visible = false; }
-
-  constructor(ctx: CanvasRenderingContext2D, dpr: number) {
-    this.text = new UITextRenderer(ctx);
-    this.dpr = dpr;
+  constructor(dpr: number = 1) {
+    this.text = new UITextRenderer(dpr);
   }
 
-  update(dt: number): void {
-    if (this._visible && this.animTimer < this.animDuration) {
-      this.animTimer = Math.min(this.animTimer + dt, this.animDuration);
-    }
-  }
-
-  render(ctx: CanvasRenderingContext2D, options: LevelUpOption[], level: number, screenW: number, screenH: number): void {
-    if (!this._visible) return;
-
-    const dpr = this.dpr;
-    ctx.save();
-    ctx.resetTransform();
-
-    // 遮罩
-    ctx.fillStyle = UI.bg.overlay;
+  render(
+    ctx: CanvasRenderingContext2D,
+    options: LevelUpOption[],
+    level: number,
+    screenW: number,
+    screenH: number,
+    _dpr: number,
+  ): void {
+    // 半透明遮罩
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(0, 0, screenW, screenH);
 
     // 标题
-    const titleProgress = Math.min(this.animTimer / 200, 1);
-    const titleScale = 0.5 + 0.5 * easing.easeOutBack(titleProgress);
-    ctx.save();
-    ctx.translate(screenW / 2, 50 * dpr);
-    ctx.scale(titleScale, titleScale);
-    ctx.translate(-screenW / 2, -50 * dpr);
-    this.text.draw(`LEVEL UP!  Lv.${level}`, screenW / 2, 30 * dpr, {
-      size: 20 * dpr, color: UI.text.gold, align: 'center',
-      stroke: true, strokeColor: '#8b6914', strokeWidth: 3 * dpr,
+    this.text.draw(ctx, `LEVEL UP! Lv.${level}`, screenW / 2, screenH * 0.25, {
+      size: 20,
+      color: COLORS.gold,
+      align: 'center',
+      baseline: 'middle',
+      font: FONT.ui,
+      shadow: true,
+      shadowColor: '#ffd700',
+      shadowBlur: 8,
     });
-    ctx.restore();
 
-    // 卡片
-    const cardW = Math.min(CARD.width * dpr, (screenW - 40 * dpr) / options.length);
-    const cardH = CARD.height * dpr;
-    const gap = CARD.gap * dpr;
+    // 卡片布局
+    const cardW = CARD.width;
+    const cardH = CARD.height;
+    const gap = CARD.gap;
     const totalW = options.length * cardW + (options.length - 1) * gap;
     const startX = (screenW - totalW) / 2;
-    const startY = screenH / 2 - cardH / 2 + 10 * dpr;
+    const startY = screenH * 0.35;
 
     for (let i = 0; i < options.length; i++) {
       const opt = options[i];
-      const x = startX + i * (cardW + gap);
-
-      // 卡片立即显示（无延迟）
-      ctx.save();
-      ctx.globalAlpha = 1;
-
-      this.renderCard(ctx, opt, x, startY, cardW, cardH, i);
-
-      ctx.restore();
+      const cx = startX + i * (cardW + gap);
+      this._renderCard(ctx, opt, cx, startY, cardW, cardH, i);
     }
 
     // 底部提示
-    if (this.animTimer > 400) {
-      this.text.draw('按 1/2/3 或 点击选择', screenW / 2, startY + cardH + 20 * dpr, {
-        size: 10 * dpr, color: UI.text.tertiary, align: 'center', shadow: false,
+    this.text.draw(ctx, '点击卡片选择', screenW / 2, startY + cardH + 30, {
+      size: 12,
+      color: COLORS.textDim,
+      align: 'center',
+      baseline: 'middle',
+      font: FONT.ui,
+    });
+  }
+
+  private _renderCard(
+    ctx: CanvasRenderingContext2D,
+    opt: LevelUpOption,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    _index: number,
+  ): void {
+    const pad = CARD.padding;
+    const radius = CARD.radius;
+
+    // 卡片背景
+    ctx.fillStyle = '#1a1a3e';
+    ctx.beginPath();
+    this._roundRect(ctx, x, y, w, h, radius);
+    ctx.fill();
+
+    // 边框 - 根据类型着色
+    let borderColor: string = COLORS.panelBorder;
+    if (opt.type === 'weapon') borderColor = RARITY.SR.color;
+    else if (opt.type === 'weapon_upgrade') borderColor = RARITY.R.color;
+    else if (opt.type === 'stat') borderColor = RARITY.N.color;
+
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    this._roundRect(ctx, x, y, w, h, radius);
+    ctx.stroke();
+
+    // 图标区域背景
+    const iconY = y + pad;
+    const iconH = CARD.iconSize;
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fillRect(x + pad, iconY, w - pad * 2, iconH);
+
+    // 图标文字(用文字代替真实图标)
+    const iconChar = this._getIconChar(opt.icon);
+    this.text.draw(ctx, iconChar, x + w / 2, iconY + iconH / 2, {
+      size: 28,
+      color: borderColor,
+      align: 'center',
+      baseline: 'middle',
+      font: FONT.ui,
+    });
+
+    // 标签 [NEW] 或 [UP]
+    let label = '';
+    let labelColor: string = COLORS.text;
+    if (opt.type === 'weapon') {
+      label = 'NEW';
+      labelColor = RARITY.SR.color;
+    } else if (opt.type === 'weapon_upgrade') {
+      label = 'UP';
+      labelColor = RARITY.R.color;
+    }
+
+    if (label) {
+      const labelX = x + w - pad - 4;
+      const labelY = y + pad + CARD.iconSize + 6;
+      this.text.draw(ctx, label, labelX, labelY, {
+        size: 8,
+        color: labelColor,
+        align: 'right',
+        font: FONT.mono,
       });
     }
 
+    // 名称
+    const nameY = y + pad + CARD.iconSize + 22;
+    this.text.draw(ctx, opt.name, x + w / 2, nameY, {
+      size: CARD.titleSize,
+      color: COLORS.white,
+      align: 'center',
+      baseline: 'middle',
+      font: FONT.ui,
+      shadow: true,
+    });
+
+    // 描述(自动换行)
+    const descY = nameY + 20;
+    this._drawWrappedText(ctx, opt.desc, x + pad + 4, descY, w - pad * 2 - 8, 14, {
+      size: CARD.descSize,
+      color: COLORS.textDim,
+      align: 'center',
+      font: FONT.ui,
+    });
+  }
+
+  hitTest(
+    clickX: number,
+    clickY: number,
+    options: LevelUpOption[],
+    screenW: number,
+    screenH: number,
+  ): number {
+    const cardW = CARD.width;
+    const cardH = CARD.height;
+    const gap = CARD.gap;
+    const totalW = options.length * cardW + (options.length - 1) * gap;
+    const startX = (screenW - totalW) / 2;
+    const startY = screenH * 0.35;
+
+    for (let i = 0; i < options.length; i++) {
+      const cx = startX + i * (cardW + gap);
+      if (clickX >= cx && clickX <= cx + cardW && clickY >= startY && clickY <= startY + cardH) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private _getIconChar(icon: string): string {
+    const map: Record<string, string> = {
+      heart: '\u2665',
+      boot: '\u26A0',
+      sword: '\u2694',
+      shield: '\u26E8',
+      star: '\u2605',
+      weapon: '\u2692',
+      upgrade: '\u2B06',
+    };
+    return map[icon] || '\u2726';
+  }
+
+  private _drawWrappedText(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxW: number,
+    lineH: number,
+    opts: { size: number; color: string; align: CanvasTextAlign; font: string },
+  ): void {
+    ctx.save();
+    ctx.font = `${opts.size}px ${opts.font}`;
+    ctx.textAlign = opts.align;
+    ctx.fillStyle = opts.color;
+
+    const chars = text.split('');
+    let line = '';
+    let ly = y;
+
+    for (const ch of chars) {
+      const test = line + ch;
+      const w = ctx.measureText(test).width;
+      if (w > maxW && line.length > 0) {
+        ctx.fillText(line, x, ly);
+        line = ch;
+        ly += lineH;
+      } else {
+        line = test;
+      }
+    }
+    if (line) ctx.fillText(line, x, ly);
     ctx.restore();
   }
 
-  private renderCard(ctx: CanvasRenderingContext2D, opt: LevelUpOption, x: number, y: number, w: number, h: number, index: number): void {
-    const dpr = this.dpr;
-    const pad = CARD.padding * dpr;
-
-    // 确定稀有度颜色（默认普通）
-    const borderColor = UI.panel.borderStrong;
-
-    // 卡片背景
-    ctx.fillStyle = UI.bg.tertiary;
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, CARD.radius * dpr);
-    ctx.fill();
-
-    // 内部渐变叠加
-    const grad = ctx.createLinearGradient(x, y, x, y + h);
-    grad.addColorStop(0, 'rgba(255,255,255,0.03)');
-    grad.addColorStop(1, 'rgba(0,0,0,0.1)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, CARD.radius * dpr);
-    ctx.fill();
-
-    // 边框
-    ctx.strokeStyle = borderColor;
-    ctx.lineWidth = 1.5 * dpr;
-    ctx.beginPath();
-    ctx.roundRect(x + 0.5, y + 0.5, w - 1, h - 1, CARD.radius * dpr);
-    ctx.stroke();
-
-    // 内边框
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(x + 2.5, y + 2.5, w - 5, h - 5, (CARD.radius - 1) * dpr);
-    ctx.stroke();
-
-    // 序号
-    this.text.draw(`[${index + 1}]`, x + w / 2, y + 12 * dpr, {
-      size: 9 * dpr, color: UI.text.tertiary, align: 'center', shadow: false,
-    });
-
-    // 图标
-    const iconId = getIconIdForOption(opt.id);
-    const iconSize = Math.min(CARD.iconSize * dpr, w - pad * 2);
-    const icon = getPixelIcon(iconId, iconSize);
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(icon, x + (w - iconSize) / 2, y + 22 * dpr, iconSize, iconSize);
-
-    // 名称
-    this.text.draw(opt.name, x + w / 2, y + 22 * dpr + iconSize + 8 * dpr, {
-      size: 12 * dpr, color: UI.text.primary, align: 'center',
-      stroke: true, strokeWidth: 2 * dpr,
-    });
-
-    // 类型标签
-    const isNew = opt.type === 'new_weapon';
-    const typeLabel = isNew ? '[NEW]' : '[UP]';
-    const typeColor = isNew ? UI.accent.green : UI.accent.blue;
-    this.text.draw(typeLabel, x + w / 2, y + 22 * dpr + iconSize + 24 * dpr, {
-      size: 9 * dpr, color: typeColor, align: 'center', shadow: false,
-    });
-
-    // 分隔线
-    const sepY = y + 22 * dpr + iconSize + 34 * dpr;
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillRect(x + pad, sepY, w - pad * 2, 1);
-
-    // 描述
-    const descY = sepY + 8 * dpr;
-    this.text.drawWrapped(opt.description, x + w / 2, descY, w - pad * 2, {
-      size: 9 * dpr, color: UI.text.secondary, align: 'center', shadow: false,
-    });
-  }
-
-  /** 检测点击了哪张卡片，返回索引或-1 */
-  hitTest(clickX: number, clickY: number, options: LevelUpOption[], screenW: number, screenH: number): number {
-    if (!this._visible || this.animTimer < 300) return -1;
-
-    const dpr = this.dpr;
-    const cardW = Math.min(CARD.width * dpr, (screenW - 40 * dpr) / options.length);
-    const cardH = CARD.height * dpr;
-    const gap = CARD.gap * dpr;
-    const totalW = options.length * cardW + (options.length - 1) * gap;
-    const startX = (screenW - totalW) / 2;
-    const startY = screenH / 2 - cardH / 2 + 10 * dpr;
-
-    const cx = clickX * dpr;
-    const cy = clickY * dpr;
-
-    if (cy < startY || cy > startY + cardH) return -1;
-
-    for (let i = 0; i < options.length; i++) {
-      const cardX = startX + i * (cardW + gap);
-      if (cx >= cardX && cx <= cardX + cardW) return i;
-    }
-    return -1;
+  private _roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
   }
 }

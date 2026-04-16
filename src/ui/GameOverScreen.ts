@@ -1,392 +1,196 @@
-/**
- * Game Over 界面 — 游戏结束统计面板
- *
- * 特性：
- * - 半透明黑色遮罩背景
- * - 标题 easeOutBack 弹入动画
- * - 数据行 staggered 淡入（每行延迟 100ms）
- * - 按钮 hover 效果（亮度提升 + 边框高亮）
- * - 武器列表展示
- */
+// GameOverScreen.ts - 游戏结束界面
 
-import { UI, duration, easing } from '@engine/UITheme';
-import { UITextRenderer } from '@engine/UITextRenderer';
-import { getPixelIcon } from '@engine/PixelIcons';
+import { COLORS, FONT } from '../engine/UITheme';
+import { UITextRenderer } from '../engine/UITextRenderer';
 
-// ═══════════════════════════════════════════════════════
-// 数据接口
-// ═══════════════════════════════════════════════════════
-
-export interface GameOverData {
-  survivalTime: number;  // 秒
-  totalKills: number;
+export interface GameOverState {
+  kills: number;
   score: number;
   level: number;
-  wave: number;
-  weapons: { id: string; name: string; level: number }[];
+  elapsed: number;
+  weapons: { name: string; level: number }[];
 }
-
-// ═══════════════════════════════════════════════════════
-// 统计行定义
-// ═══════════════════════════════════════════════════════
-
-interface StatRow {
-  icon: string;       // PixelIcons id
-  iconColor: string;  // 图标着色
-  label: string;
-  value: string;
-}
-
-// ═══════════════════════════════════════════════════════
-// GameOverScreen
-// ═══════════════════════════════════════════════════════
 
 export class GameOverScreen {
   private text: UITextRenderer;
-  private dpr: number;
-  private animTimer = 0;
-  private readonly titleDuration = duration.slow;
-  private readonly rowStagger = 100; // ms
-  private readonly rowFadeDuration = 300;
-  private hoverBtn: 'restart' | 'menu' | null = null;
 
-  constructor(ctx: CanvasRenderingContext2D, dpr: number) {
-    this.text = new UITextRenderer(ctx);
-    this.dpr = dpr;
+  constructor(dpr: number = 1) {
+    this.text = new UITextRenderer(dpr);
   }
 
-  /** 重置动画计时器（每次显示时调用） */
-  reset(): void {
-    this.animTimer = 0;
-    this.hoverBtn = null;
-  }
-
-  update(dt: number): void {
-    this.animTimer += dt;
-  }
-
-  // ─── 主渲染 ───────────────────────────────────────
-
-  render(ctx: CanvasRenderingContext2D, data: GameOverData, screenW: number, screenH: number): void {
-    const dpr = this.dpr;
-    ctx.save();
-    ctx.resetTransform();
-
-    // 半透明黑色遮罩
-    ctx.fillStyle = UI.bg.overlay;
+  render(
+    ctx: CanvasRenderingContext2D,
+    state: GameOverState,
+    screenW: number,
+    screenH: number,
+    _dpr: number,
+  ): void {
+    // 半透明遮罩
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
     ctx.fillRect(0, 0, screenW, screenH);
 
-    // 内容区域居中
-    const contentW = Math.min(320 * dpr, screenW - 24 * dpr);
-    const contentH = screenH * 0.85;
-    const cx = (screenW - contentW) / 2;
-    const cy = (screenH - contentH) / 2;
+    const centerX = screenW / 2;
+    const startY = screenH * 0.2;
 
-    // 面板背景
-    this.renderPanel(ctx, cx, cy, contentW, contentH);
-
-    // 标题 — easeOutBack 弹入
-    const titleProgress = Math.min(this.animTimer / this.titleDuration, 1);
-    const titleScale = easing.easeOutBack(titleProgress);
-    ctx.save();
-    ctx.globalAlpha = titleProgress;
-    ctx.translate(screenW / 2, cy + 36 * dpr);
-    ctx.scale(titleScale, titleScale);
-    ctx.translate(-screenW / 2, -(cy + 36 * dpr));
-    this.text.draw('GAME OVER', screenW / 2, cy + 20 * dpr, {
-      size: 24 * dpr, color: UI.accent.red, align: 'center',
-      stroke: true, strokeColor: '#8b0000', strokeWidth: 3 * dpr,
+    // GAME OVER 标题
+    this.text.draw(ctx, 'GAME OVER', centerX, startY, {
+      size: 32,
+      color: COLORS.accent,
+      align: 'center',
+      baseline: 'middle',
+      font: FONT.ui,
+      shadow: true,
+      shadowColor: '#e94560',
+      shadowBlur: 12,
     });
-    ctx.restore();
 
-    // 统计行
-    const rows = this.buildStatRows(data);
-    const rowStartY = cy + 70 * dpr;
-    const rowGap = 28 * dpr;
+    // 分割线
+    const lineY = startY + 40;
+    ctx.strokeStyle = 'rgba(233,69,96,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(centerX - 100, lineY);
+    ctx.lineTo(centerX + 100, lineY);
+    ctx.stroke();
 
-    for (let i = 0; i < rows.length; i++) {
-      const rowDelay = this.titleDuration + i * this.rowStagger;
-      const rowProgress = Math.max(0, Math.min((this.animTimer - rowDelay) / this.rowFadeDuration, 1));
-      if (rowProgress <= 0) continue;
+    // 统计数据
+    const statsY = lineY + 30;
+    const lineH = 32;
 
-      const eased = easing.easeOutCubic(rowProgress);
-      ctx.save();
-      ctx.globalAlpha = eased;
-      this.renderStatRow(ctx, rows[i], cx + 16 * dpr, rowStartY + i * rowGap, contentW - 32 * dpr);
-      ctx.restore();
-    }
+    const mins = Math.floor(state.elapsed / 60);
+    const secs = Math.floor(state.elapsed % 60);
+
+    this._renderStatRow(ctx, '存活时间', `${mins}分${secs.toString().padStart(2, '0')}秒`, centerX, statsY, COLORS.text);
+    this._renderStatRow(ctx, '击杀数', `${state.kills}`, centerX, statsY + lineH, COLORS.accentLight);
+    this._renderStatRow(ctx, '分数', `${state.score}`, centerX, statsY + lineH * 2, COLORS.gold);
+    this._renderStatRow(ctx, '等级', `Lv.${state.level}`, centerX, statsY + lineH * 3, '#00ff88');
 
     // 武器列表
-    const weaponDelay = this.titleDuration + rows.length * this.rowStagger + 100;
-    const weaponProgress = Math.max(0, Math.min((this.animTimer - weaponDelay) / this.rowFadeDuration, 1));
-    if (weaponProgress > 0 && data.weapons.length > 0) {
-      ctx.save();
-      ctx.globalAlpha = easing.easeOutCubic(weaponProgress);
-      const weaponY = rowStartY + rows.length * rowGap + 8 * dpr;
-      this.renderWeaponList(ctx, data.weapons, cx + 16 * dpr, weaponY, contentW - 32 * dpr);
-      ctx.restore();
+    if (state.weapons.length > 0) {
+      const weaponY = statsY + lineH * 4 + 16;
+      this.text.draw(ctx, '使用武器', centerX, weaponY, {
+        size: 12,
+        color: COLORS.textDim,
+        align: 'center',
+        baseline: 'middle',
+        font: FONT.ui,
+      });
+
+      const weaponStr = state.weapons.map(w => `${w.name} Lv.${w.level}`).join(' / ');
+      this.text.draw(ctx, weaponStr, centerX, weaponY + 22, {
+        size: 11,
+        color: COLORS.text,
+        align: 'center',
+        baseline: 'middle',
+        font: FONT.ui,
+      });
     }
 
     // 按钮
-    const btnDelay = weaponDelay + 200;
-    const btnProgress = Math.max(0, Math.min((this.animTimer - btnDelay) / this.rowFadeDuration, 1));
-    if (btnProgress > 0) {
-      ctx.save();
-      ctx.globalAlpha = easing.easeOutCubic(btnProgress);
-      const btnY = cy + contentH - 70 * dpr;
-      this.renderButtons(ctx, cx, btnY, contentW);
-      ctx.restore();
-    }
-
-    ctx.restore();
-  }
-
-  // ─── 面板背景 ─────────────────────────────────────
-
-  private renderPanel(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
-    const dpr = this.dpr;
-
-    // 主背景
-    ctx.fillStyle = UI.panel.bg;
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 8 * dpr);
-    ctx.fill();
-
-    // 渐变叠加
-    const grad = ctx.createLinearGradient(x, y, x, y + h);
-    grad.addColorStop(0, 'rgba(255,255,255,0.04)');
-    grad.addColorStop(0.5, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(0,0,0,0.15)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 8 * dpr);
-    ctx.fill();
-
-    // 外边框
-    ctx.strokeStyle = UI.panel.borderStrong;
-    ctx.lineWidth = 1.5 * dpr;
-    ctx.beginPath();
-    ctx.roundRect(x + 0.5, y + 0.5, w - 1, h - 1, 8 * dpr);
-    ctx.stroke();
-
-    // 内边框
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(x + 3 * dpr, y + 3 * dpr, w - 6 * dpr, h - 6 * dpr, 6 * dpr);
-    ctx.stroke();
-  }
-
-  // ─── 统计行 ───────────────────────────────────────
-
-  private renderStatRow(ctx: CanvasRenderingContext2D, row: StatRow, x: number, y: number, _maxW: number): void {
-    const dpr = this.dpr;
-    const iconSize = 16 * dpr;
-
-    // 图标
-    const icon = getPixelIcon(row.icon, iconSize);
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(icon, x, y + 2 * dpr, iconSize, iconSize);
-
-    // 标签
-    this.text.draw(row.label, x + iconSize + 8 * dpr, y + 2 * dpr, {
-      size: 12 * dpr, color: UI.text.secondary, shadow: false,
-    });
-
-    // 数值
-    this.text.draw(row.value, x + iconSize + 8 * dpr, y + 14 * dpr, {
-      size: 14 * dpr, color: UI.text.primary, stroke: true, strokeWidth: 2 * dpr,
-    });
-  }
-
-  // ─── 武器列表 ─────────────────────────────────────
-
-  private renderWeaponList(
-    ctx: CanvasRenderingContext2D,
-    weapons: { id: string; name: string; level: number }[],
-    x: number, y: number, _maxW: number,
-  ): void {
-    const dpr = this.dpr;
-
-    // 小标题
-    this.text.draw('使用的武器', x, y, {
-      size: 11 * dpr, color: UI.text.secondary, shadow: false,
-    });
-
-    // 分隔线
-    const sepY = y + 16 * dpr;
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillRect(x, sepY, _maxW, 1);
-
-    const iconSize = 14 * dpr;
-    const itemY = sepY + 6 * dpr;
-
-    for (let i = 0; i < weapons.length; i++) {
-      const w = weapons[i];
-      const wy = itemY + i * 22 * dpr;
-
-      // 武器图标
-      const icon = getPixelIcon(w.id, iconSize);
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(icon, x, wy, iconSize, iconSize);
-
-      // 武器名 + 等级
-      this.text.draw(`${w.name}  Lv.${w.level}`, x + iconSize + 6 * dpr, wy + 1 * dpr, {
-        size: 11 * dpr, color: UI.text.primary, shadow: false,
-      });
-    }
-  }
-
-  // ─── 按钮 ─────────────────────────────────────────
-
-  private renderButtons(ctx: CanvasRenderingContext2D, panelX: number, y: number, panelW: number): void {
-    const dpr = this.dpr;
-    const btnW = 120 * dpr;
-    const btnH = 40 * dpr;
-    const gap = 16 * dpr;
-    const totalW = btnW * 2 + gap;
-    const startX = panelX + (panelW - totalW) / 2;
+    const btnW = 160;
+    const btnH = 42;
+    const btnGap = 12;
+    const btnStartY = screenH * 0.72;
 
     // 重新开始按钮
-    this.renderButton(ctx, startX, y, btnW, btnH, '重新开始', 'restart', UI.accent.green);
-    // 主菜单按钮
-    this.renderButton(ctx, startX + btnW + gap, y, btnW, btnH, '主菜单', 'menu', UI.accent.blue);
+    const restartX = (screenW - btnW) / 2;
+    this._renderButton(ctx, '重新开始', restartX, btnStartY, btnW, btnH, true);
+
+    // 返回菜单按钮
+    this._renderButton(ctx, '返回菜单', restartX, btnStartY + btnH + btnGap, btnW, btnH, false);
   }
 
-  private renderButton(
-    ctx: CanvasRenderingContext2D,
-    x: number, y: number, w: number, h: number,
-    label: string, id: 'restart' | 'menu', color: string,
-  ): void {
-    const dpr = this.dpr;
-    const isHover = this.hoverBtn === id;
-
-    // 按钮背景
-    ctx.fillStyle = isHover ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)';
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 4 * dpr);
-    ctx.fill();
-
-    // hover 高亮边框
-    if (isHover) {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 2 * dpr;
-    } else {
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-      ctx.lineWidth = 1;
-    }
-    ctx.beginPath();
-    ctx.roundRect(x + 0.5, y + 0.5, w - 1, h - 1, 4 * dpr);
-    ctx.stroke();
-
-    // 按钮文字
-    this.text.draw(label, x + w / 2, y + h / 2 - 6 * dpr, {
-      size: 13 * dpr,
-      color: isHover ? color : UI.text.primary,
-      align: 'center',
-      stroke: true,
-      strokeWidth: 2 * dpr,
-    });
-  }
-
-  // ─── 点击检测 ─────────────────────────────────────
-
-  hitTest(clickX: number, clickY: number, screenW: number, screenH: number): 'restart' | 'menu' | null {
-    const dpr = this.dpr;
-    const contentW = Math.min(320 * dpr, screenW - 24 * dpr);
-    const contentH = screenH * 0.85;
-    const panelX = (screenW - contentW) / 2;
-    const btnY = (screenH - contentH) / 2 + contentH - 70 * dpr;
-
-    const btnW = 120 * dpr;
-    const btnH = 40 * dpr;
-    const gap = 16 * dpr;
-    const totalW = btnW * 2 + gap;
-    const startX = panelX + (contentW - totalW) / 2;
-
-    const cx = clickX * dpr;
-    const cy = clickY * dpr;
+  hitTest(clickX: number, clickY: number, screenW: number, screenH: number): string {
+    const btnW = 160;
+    const btnH = 42;
+    const btnGap = 12;
+    const btnStartY = screenH * 0.72;
+    const btnX = (screenW - btnW) / 2;
 
     // 重新开始
-    if (cx >= startX && cx <= startX + btnW && cy >= btnY && cy <= btnY + btnH) {
+    if (clickX >= btnX && clickX <= btnX + btnW && clickY >= btnStartY && clickY <= btnStartY + btnH) {
       return 'restart';
     }
-    // 主菜单
-    const menuX = startX + btnW + gap;
-    if (cx >= menuX && cx <= menuX + btnW && cy >= btnY && cy <= btnY + btnH) {
+    // 返回菜单
+    if (clickX >= btnX && clickX <= btnX + btnW && clickY >= btnStartY + btnH + btnGap && clickY <= btnStartY + btnH * 2 + btnGap) {
       return 'menu';
     }
 
-    return null;
+    return '';
   }
 
-  // ─── hover 更新 ───────────────────────────────────
+  private _renderStatRow(
+    ctx: CanvasRenderingContext2D,
+    label: string,
+    value: string,
+    cx: number,
+    y: number,
+    valueColor: string,
+  ): void {
+    // 标签
+    this.text.draw(ctx, label, cx - 60, y, {
+      size: 13,
+      color: COLORS.textDim,
+      align: 'right',
+      baseline: 'middle',
+      font: FONT.ui,
+    });
+    // 值
+    this.text.draw(ctx, value, cx + 60, y, {
+      size: 14,
+      color: valueColor,
+      align: 'left',
+      baseline: 'middle',
+      font: FONT.mono,
+    });
+  }
 
-  updateHover(mouseX: number, mouseY: number, screenW: number, screenH: number): void {
-    const dpr = this.dpr;
-    const contentW = Math.min(320 * dpr, screenW - 24 * dpr);
-    const contentH = screenH * 0.85;
-    const panelX = (screenW - contentW) / 2;
-    const btnY = (screenH - contentH) / 2 + contentH - 70 * dpr;
-
-    const btnW = 120 * dpr;
-    const btnH = 40 * dpr;
-    const gap = 16 * dpr;
-    const totalW = btnW * 2 + gap;
-    const startX = panelX + (contentW - totalW) / 2;
-
-    const cx = mouseX * dpr;
-    const cy = mouseY * dpr;
-
-    this.hoverBtn = null;
-    if (cx >= startX && cx <= startX + btnW && cy >= btnY && cy <= btnY + btnH) {
-      this.hoverBtn = 'restart';
+  private _renderButton(
+    ctx: CanvasRenderingContext2D,
+    label: string,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    highlight: boolean,
+  ): void {
+    if (highlight) {
+      const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+      grad.addColorStop(0, '#e94560');
+      grad.addColorStop(1, '#ff6b81');
+      ctx.fillStyle = grad;
     } else {
-      const menuX = startX + btnW + gap;
-      if (cx >= menuX && cx <= menuX + btnW && cy >= btnY && cy <= btnY + btnH) {
-        this.hoverBtn = 'menu';
-      }
+      ctx.fillStyle = 'rgba(30,30,54,0.8)';
     }
+    ctx.beginPath();
+    this._roundRect(ctx, x, y, w, h, 8);
+    ctx.fill();
+
+    ctx.strokeStyle = highlight ? '#ff6b81' : COLORS.panelBorder;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    this._roundRect(ctx, x, y, w, h, 8);
+    ctx.stroke();
+
+    this.text.draw(ctx, label, x + w / 2, y + h / 2, {
+      size: 15,
+      color: COLORS.white,
+      align: 'center',
+      baseline: 'middle',
+      font: FONT.ui,
+    });
   }
 
-  // ─── 构建统计行 ───────────────────────────────────
-
-  private buildStatRows(data: GameOverData): StatRow[] {
-    const minutes = Math.floor(data.survivalTime / 60);
-    const seconds = Math.floor(data.survivalTime % 60);
-    const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-    return [
-      {
-        icon: 'speed_boost',
-        iconColor: UI.accent.blue,
-        label: '存活时间',
-        value: timeStr,
-      },
-      {
-        icon: 'damage_boost',
-        iconColor: UI.accent.red,
-        label: '击杀总数',
-        value: data.totalKills.toLocaleString(),
-      },
-      {
-        icon: 'speed_boost',
-        iconColor: UI.accent.gold,
-        label: '收集分数',
-        value: data.score.toLocaleString(),
-      },
-      {
-        icon: 'hp_boost',
-        iconColor: '#aa66ff',
-        label: '达成等级',
-        value: String(data.level),
-      },
-      {
-        icon: 'damage_boost',
-        iconColor: '#44dddd',
-        label: '到达波次',
-        value: String(data.wave),
-      },
-    ];
+  private _roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
   }
 }

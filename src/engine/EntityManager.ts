@@ -1,73 +1,61 @@
-/**
- * 实体管理器 - 性能优化版
- *
- * - getAll() 使用脏标记缓存，避免每帧 Array.from + filter
- * - 每帧开始时调用 beginFrame()，结束时调用 endFrame()
- */
+// EntityManager.ts - 简化ECS
 
 export interface Entity {
-  readonly id: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  sprite: HTMLCanvasElement;
+  id: string;
   active: boolean;
-  speed: number;
+  [key: string]: unknown;
 }
 
-let _nextId = 1;
-
 export class EntityManager {
-  private _entities = new Map<number, Entity>();
-  private _cache: Entity[] = [];
-  private _dirty = true;
+  private entities = new Map<string, Entity>();
+  private pendingAdd: Entity[] = [];
+  private pendingRemove: string[] = [];
 
   add(entity: Entity): void {
-    this._entities.set(entity.id, entity);
-    this._dirty = true;
+    this.pendingAdd.push(entity);
   }
 
-  remove(id: number): void {
-    this._entities.delete(id);
-    this._dirty = true;
+  remove(id: string): void {
+    this.pendingRemove.push(id);
   }
 
-  get(id: number): Entity | undefined {
-    return this._entities.get(id);
+  get(id: string): Entity | undefined {
+    return this.entities.get(id);
   }
 
-  /** 获取所有活跃实体（带缓存） */
   getAll(): Entity[] {
-    if (this._dirty) {
-      this._cache = Array.from(this._entities.values()).filter(e => e.active);
-      this._dirty = false;
+    const result: Entity[] = [];
+    for (const e of this.entities.values()) {
+      if (e.active) result.push(e);
     }
-    return this._cache;
+    return result;
   }
 
-  /** 按条件查询 */
-  query(predicate: (e: Entity) => boolean): Entity[] {
-    return this.getAll().filter(predicate);
+  getAllIncludingInactive(): Entity[] {
+    return Array.from(this.entities.values());
   }
 
-  /** 标记脏（实体状态变化时外部调用） */
-  markDirty(): void {
-    this._dirty = true;
-  }
-
-  /** 清理所有非活跃实体 */
-  cleanup(): void {
-    for (const [id, entity] of this._entities) {
-      if (!entity.active) {
-        this._entities.delete(id);
-        this._dirty = true;
-      }
+  beginFrame(): void {
+    for (const e of this.pendingAdd) {
+      this.entities.set(e.id, e);
     }
+    this.pendingAdd = [];
   }
 
-  /** 生成唯一 ID */
-  static nextId(): number {
-    return _nextId++;
+  endFrame(): void {
+    for (const id of this.pendingRemove) {
+      this.entities.delete(id);
+    }
+    this.pendingRemove = [];
+  }
+
+  clear(): void {
+    this.entities.clear();
+    this.pendingAdd = [];
+    this.pendingRemove = [];
+  }
+
+  get count(): number {
+    return this.entities.size;
   }
 }

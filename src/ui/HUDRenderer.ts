@@ -1,201 +1,224 @@
-/**
- * 专业HUD渲染器 — 替代Renderer.ts中的基础HUD
- * 布局参考Vampire Survivors
- */
+// HUDRenderer.ts - 专业HUD渲染器
 
-import { UI, HUD as HUD_CONST, WEAPON_SLOT } from '@engine/UITheme';
-import { UITextRenderer } from '@engine/UITextRenderer';
-import { getPixelIcon } from '@engine/PixelIcons';
+import { COLORS, HUD as HUDLayout, FONT } from '../engine/UITheme';
+import { UITextRenderer } from '../engine/UITextRenderer';
 
 export interface HUDState {
-  wave: number;
-  score: number;
-  kills: number;
   hp: number;
   maxHp: number;
   xp: number;
   xpToNext: number;
   level: number;
-  elapsedTime: number;
-  weapons: { id: string; level: number; maxLevel: number }[];
+  weapons: { name: string; level: number; cooldown: number; maxCooldown: number; color: string }[];
+  kills: number;
+  score: number;
+  elapsed: number;
+  dpr: number;
+  playerScreenX: number;
+  playerScreenY: number;
 }
 
 export class HUDRenderer {
   private text: UITextRenderer;
-  private dpr: number;
+  private displayHp = 0; // 平滑动画用
 
-  constructor(ctx: CanvasRenderingContext2D, dpr: number) {
-    this.text = new UITextRenderer(ctx);
-    this.dpr = dpr;
+  constructor(dpr: number = 1) {
+    this.text = new UITextRenderer(dpr);
   }
 
-  render(ctx: CanvasRenderingContext2D, state: HUDState, screenW: number, _screenH: number): void {
-    ctx.save();
-    ctx.resetTransform();
+  render(ctx: CanvasRenderingContext2D, state: HUDState): void {
+    const dpr = state.dpr;
+    const sw = ctx.canvas.width / dpr;
+    const sh = ctx.canvas.height / dpr;
 
-    this.renderXPBar(ctx, state, screenW);
-    this.renderWeaponSlots(ctx, state);
-    this.renderStats(ctx, state, screenW);
-    this.renderWaveInfo(ctx, state);
+    // 平滑血条
+    this.displayHp += (state.hp - this.displayHp) * 0.15;
+    if (Math.abs(this.displayHp - state.hp) < 0.5) this.displayHp = state.hp;
 
-    ctx.restore();
+    this._renderXpBar(ctx, state, sw);
+    this._renderLevelBadge(ctx, state);
+    this._renderTopRight(ctx, state, sw);
+    this._renderWeaponBar(ctx, state, sw, sh);
+    this._renderPlayerHpBar(ctx, state);
   }
 
-  /** 渲染角色上方跟随血条（世界坐标） */
-  renderPlayerHP(ctx: CanvasRenderingContext2D, x: number, y: number, hp: number, maxHp: number, camX: number, camY: number): void {
-    const dpr = this.dpr;
-    const barW = 60 * dpr;
-    const barH = 8 * dpr;
-    const sx = Math.round(x - camX - barW / 2);
-    const sy = Math.round(y - camY - 20 * dpr);
-    const ratio = Math.max(0, Math.min(1, hp / maxHp));
+  /** 顶部全宽XP条 */
+  private _renderXpBar(ctx: CanvasRenderingContext2D, state: HUDState, sw: number): void {
+    const barH = 6;
+    const y = 0;
+    const pad = 0;
+    const progress = Math.min(state.xp / state.xpToNext, 1);
 
     // 背景
-    ctx.fillStyle = UI.bar.hp.bg;
-    ctx.fillRect(sx, sy, barW, barH);
+    ctx.fillStyle = COLORS.xpBg;
+    ctx.fillRect(pad, y, sw - pad * 2, barH);
 
-    // 填充（渐变红）
-    if (ratio > 0) {
-      const grad = ctx.createLinearGradient(sx, sy, sx, sy + barH);
-      grad.addColorStop(0, UI.bar.hp.hi);
-      grad.addColorStop(1, UI.bar.hp.fill);
+    // 渐变填充
+    if (progress > 0) {
+      const grad = ctx.createLinearGradient(pad, 0, pad + (sw - pad * 2) * progress, 0);
+      grad.addColorStop(0, '#00cc66');
+      grad.addColorStop(1, '#00ff88');
       ctx.fillStyle = grad;
-      ctx.fillRect(sx + 1, sy + 1, (barW - 2) * ratio, barH - 2);
+      ctx.fillRect(pad, y, (sw - pad * 2) * progress, barH);
+
+      // 高光
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillRect(pad, y, (sw - pad * 2) * progress, barH / 2);
     }
-
-    // 高光线
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.fillRect(sx + 1, sy + 1, (barW - 2) * ratio, 1);
-
-    // 边框
-    ctx.strokeStyle = UI.bar.hp.border;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(sx + 0.5, sy + 0.5, barW - 1, barH - 1);
   }
 
-  private renderXPBar(ctx: CanvasRenderingContext2D, state: HUDState, screenW: number): void {
-    const dpr = this.dpr;
-    const barH = HUD_CONST.xpBarHeight * dpr;
-    const ratio = Math.min(state.xp / state.xpToNext, 1);
+  /** 左上角色等级 */
+  private _renderLevelBadge(ctx: CanvasRenderingContext2D, state: HUDState): void {
+    const x = HUDLayout.left + 8;
+    const y = HUDLayout.top + 14;
 
-    // 背景
-    ctx.fillStyle = UI.bar.xp.bg;
-    ctx.fillRect(0, 0, screenW, barH);
+    // 等级背景圆
+    const r = HUDLayout.levelBadge.radius;
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.beginPath();
+    ctx.arc(x + r, y + r, r, 0, Math.PI * 2);
+    ctx.fill();
 
-    // 填充
-    if (ratio > 0) {
-      const grad = ctx.createLinearGradient(0, 0, 0, barH);
-      grad.addColorStop(0, UI.bar.xp.hi);
-      grad.addColorStop(1, UI.bar.xp.fill);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, screenW * ratio, barH);
-    }
+    ctx.strokeStyle = COLORS.gold;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x + r, y + r, r, 0, Math.PI * 2);
+    ctx.stroke();
 
-    // 高光线
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillRect(0, 0, screenW * ratio, 1);
-
-    // 满时闪烁
-    if (ratio >= 0.95) {
-      const flash = 0.2 + 0.15 * Math.sin(Date.now() / 100);
-      ctx.fillStyle = `rgba(255,255,255,${flash})`;
-      ctx.fillRect(0, 0, screenW, barH);
-    }
-
-    // 等级文字
-    this.text.draw(`Lv.${state.level}`, 8, barH + 4, {
-      size: 10 * dpr, color: UI.text.xp, stroke: true, strokeWidth: 2 * dpr,
+    this.text.draw(ctx, `${state.level}`, x + r, y + r, {
+      size: 14,
+      color: COLORS.gold,
+      align: 'center',
+      baseline: 'middle',
+      font: FONT.ui,
+      shadow: true,
     });
   }
 
-  private renderWeaponSlots(ctx: CanvasRenderingContext2D, state: HUDState): void {
-    const dpr = this.dpr;
-    const slotSize = WEAPON_SLOT.size * dpr;
-    const gap = WEAPON_SLOT.gap * dpr;
-    const startX = 8 * dpr;
-    const startY = (HUD_CONST.xpBarHeight + 20) * dpr;
-
-    for (let i = 0; i < WEAPON_SLOT.cols; i++) {
-      const col = i % WEAPON_SLOT.cols;
-      const sx = startX + col * (slotSize + gap);
-      const sy = startY;
-
-      // 槽位背景
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(sx, sy, slotSize, slotSize);
-
-      // 武器图标
-      if (state.weapons[i]) {
-        const w = state.weapons[i];
-        const iconSize = slotSize - 8 * dpr;
-        const icon = getPixelIcon(w.id, iconSize);
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(icon, sx + 4 * dpr, sy + 4 * dpr, iconSize, iconSize);
-
-        // 等级点
-        const dotSize = 3 * dpr;
-        const dotGap = 2 * dpr;
-        const dotsW = w.maxLevel * (dotSize + dotGap) - dotGap;
-        const dotStartX = sx + (slotSize - dotsW) / 2;
-        for (let d = 0; d < w.maxLevel; d++) {
-          ctx.fillStyle = d < w.level ? '#ffd700' : '#333355';
-          ctx.fillRect(dotStartX + d * (dotSize + dotGap), sy + slotSize - dotSize - 2 * dpr, dotSize, dotSize);
-        }
-
-        // 满级边框
-        if (w.level >= w.maxLevel) {
-          ctx.strokeStyle = '#ffd700';
-          ctx.lineWidth = 1.5 * dpr;
-          ctx.strokeRect(sx + 0.5, sy + 0.5, slotSize - 1, slotSize - 1);
-        }
-      }
-
-      // 空槽位边框
-      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(sx + 0.5, sy + 0.5, slotSize - 1, slotSize - 1);
-    }
-  }
-
-  private renderStats(_ctx: CanvasRenderingContext2D, state: HUDState, screenW: number): void {
-    const dpr = this.dpr;
-    const rightX = screenW - 8 * dpr;
-    let y = (HUD_CONST.xpBarHeight + 20) * dpr;
+  /** 右上角计时器/击杀数/分数 */
+  private _renderTopRight(ctx: CanvasRenderingContext2D, state: HUDState, sw: number): void {
+    const rx = sw - HUDLayout.right;
+    const ty = HUDLayout.top + 14;
 
     // 计时器
-    this.text.drawTimer(state.elapsedTime, rightX, y, {
-      size: HUD_CONST.timerSize * dpr, align: 'right',
-      stroke: true, strokeWidth: 2 * dpr,
+    const mins = Math.floor(state.elapsed / 60);
+    const secs = Math.floor(state.elapsed % 60);
+    const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+    this.text.draw(ctx, timeStr, rx, ty, {
+      size: 16,
+      color: COLORS.text,
+      align: 'right',
+      font: FONT.mono,
+      shadow: true,
     });
-    y += 24 * dpr;
 
     // 击杀数
-    this.text.drawNumber(state.kills, rightX, y, {
-      size: HUD_CONST.statsSize * dpr, color: UI.accent.red, align: 'right',
-      stroke: true, strokeWidth: 2 * dpr,
+    this.text.draw(ctx, `${state.kills} KILLS`, rx, ty + 22, {
+      size: 12,
+      color: COLORS.accentLight,
+      align: 'right',
+      font: FONT.mono,
     });
-    this.text.draw('KILLS', rightX, y + 14 * dpr, {
-      size: 8 * dpr, color: UI.text.tertiary, align: 'right', shadow: false,
-    });
-    y += 32 * dpr;
 
     // 分数
-    this.text.drawNumber(state.score, rightX, y, {
-      size: HUD_CONST.statsSize * dpr, color: UI.text.gold, align: 'right',
-      stroke: true, strokeWidth: 2 * dpr,
-    });
-    this.text.draw('SCORE', rightX, y + 14 * dpr, {
-      size: 8 * dpr, color: UI.text.tertiary, align: 'right', shadow: false,
+    this.text.draw(ctx, `${state.score}`, rx, ty + 40, {
+      size: 12,
+      color: COLORS.gold,
+      align: 'right',
+      font: FONT.mono,
     });
   }
 
-  private renderWaveInfo(_ctx: CanvasRenderingContext2D, state: HUDState): void {
-    const dpr = this.dpr;
-    const x = 8 * dpr;
-    const y = (HUD_CONST.xpBarHeight + 20 + WEAPON_SLOT.size + 8) * dpr;
+  /** 底部武器栏(6槽位) */
+  private _renderWeaponBar(ctx: CanvasRenderingContext2D, state: HUDState, sw: number, sh: number): void {
+    const slotSize = 44;
+    const gap = 6;
+    const totalSlots = 6;
+    const totalW = totalSlots * slotSize + (totalSlots - 1) * gap;
+    const startX = (sw - totalW) / 2;
+    const y = sh - HUDLayout.bottom - slotSize - 4;
 
-    this.text.draw(`Wave ${state.wave}`, x, y, {
-      size: 11 * dpr, color: UI.text.secondary, shadow: false,
-    });
+    for (let i = 0; i < totalSlots; i++) {
+      const x = startX + i * (slotSize + gap);
+      const weapon = state.weapons[i];
+
+      // 槽位背景
+      ctx.fillStyle = weapon ? 'rgba(30,30,54,0.85)' : 'rgba(15,15,26,0.6)';
+      ctx.fillRect(x, y, slotSize, slotSize);
+
+      // 边框
+      ctx.strokeStyle = weapon ? COLORS.panelBorder : 'rgba(42,42,74,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x, y, slotSize, slotSize);
+
+      if (weapon) {
+        // 武器颜色指示
+        ctx.fillStyle = weapon.color;
+        ctx.fillRect(x + 3, y + 3, slotSize - 6, 3);
+
+        // 武器名(截断)
+        this.text.draw(ctx, weapon.name, x + slotSize / 2, y + 18, {
+          size: 9,
+          color: COLORS.text,
+          align: 'center',
+          font: FONT.ui,
+        });
+
+        // 等级
+        this.text.draw(ctx, `Lv.${weapon.level}`, x + slotSize / 2, y + 30, {
+          size: 8,
+          color: COLORS.gold,
+          align: 'center',
+          font: FONT.mono,
+        });
+
+        // 冷却指示
+        if (weapon.maxCooldown > 0 && weapon.cooldown > 0) {
+          const cdProgress = weapon.cooldown / weapon.maxCooldown;
+          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          ctx.fillRect(x, y, slotSize, slotSize * cdProgress);
+        }
+      }
+    }
+  }
+
+  /** 角色跟随血条 */
+  private _renderPlayerHpBar(ctx: CanvasRenderingContext2D, state: HUDState): void {
+    const px = state.playerScreenX;
+    const py = state.playerScreenY;
+    const barW = 48;
+    const barH = 6;
+    const offsetY = -28;
+    const x = px - barW / 2;
+    const y = py + offsetY;
+
+    const hpRatio = Math.max(0, this.displayHp / state.maxHp);
+
+    // 背景
+    ctx.fillStyle = COLORS.hpBg;
+    ctx.fillRect(x, y, barW, barH);
+
+    // 渐变填充
+    if (hpRatio > 0) {
+      const grad = ctx.createLinearGradient(x, 0, x + barW * hpRatio, 0);
+      grad.addColorStop(0, '#cc2244');
+      grad.addColorStop(1, COLORS.hp);
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, barW * hpRatio, barH);
+
+      // 高光
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.fillRect(x, y, barW * hpRatio, barH / 2);
+    }
+
+    // 边框
+    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, barW, barH);
+  }
+
+  reset(): void {
+    this.displayHp = 0;
   }
 }

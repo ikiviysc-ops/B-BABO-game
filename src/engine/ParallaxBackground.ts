@@ -1,268 +1,159 @@
-/**
- * 视差背景系统 — 性能优化版
- *
- * 优化策略：
- * - 星空层预渲染到离屏Canvas（静态，只渲染一次）
- * - 远山/树木层每帧只绘制可见部分
- * - 地面装饰减少到100个
- */
+// ParallaxBackground.ts - 视差背景，3层
 
-import type { Camera } from '@engine/Camera';
-
-// ─── 伪随机 ───────────────────────────────────────────────
-
-function seededRandom(seed: number): number {
-  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
-  return x - Math.floor(x);
+interface ParallaxLayer {
+  canvas: HTMLCanvasElement;
+  speed: number; // 0~1, 越小越远
 }
-
-// ─── 星空层（预渲染） ─────────────────────────────────────
-
-let starCanvas: HTMLCanvasElement | null = null;
-let starCanvasW = 0;
-let starCanvasH = 0;
-
-function ensureStarCanvas(w: number, h: number): HTMLCanvasElement {
-  if (starCanvas && starCanvasW === w && starCanvasH === h) return starCanvas;
-
-  starCanvas = document.createElement('canvas');
-  starCanvas.width = w;
-  starCanvas.height = h;
-  starCanvasW = w;
-  starCanvasH = h;
-  const ctx = starCanvas.getContext('2d')!;
-
-  // 深空背景
-  ctx.fillStyle = '#080812';
-  ctx.fillRect(0, 0, w, h);
-
-  // 星星
-  for (let i = 0; i < 80; i++) {
-    const sx = seededRandom(i * 3) * w;
-    const sy = seededRandom(i * 3 + 1) * h;
-    const size = seededRandom(i * 3 + 2) > 0.85 ? 2 : 1;
-    const brightness = 0.3 + seededRandom(i * 7) * 0.7;
-    ctx.globalAlpha = brightness;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(Math.round(sx), Math.round(sy), size, size);
-  }
-  ctx.globalAlpha = 1;
-
-  // 月亮
-  const moonX = w * 0.8;
-  const moonY = 60;
-  const moonR = 25;
-
-  ctx.fillStyle = 'rgba(200, 200, 255, 0.05)';
-  ctx.beginPath();
-  ctx.arc(moonX, moonY, moonR * 3, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = 'rgba(200, 200, 255, 0.1)';
-  ctx.beginPath();
-  ctx.arc(moonX, moonY, moonR * 1.8, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#ccccdd';
-  ctx.beginPath();
-  ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#080812';
-  ctx.beginPath();
-  ctx.arc(moonX + 8, moonY - 3, moonR * 0.85, 0, Math.PI * 2);
-  ctx.fill();
-
-  return starCanvas;
-}
-
-// ─── 远山层 ───────────────────────────────────────────────
-
-interface Mountain {
-  x: number;
-  width: number;
-  height: number;
-  color: string;
-}
-
-const MOUNTAINS: Mountain[] = [];
-
-function initMountains(): void {
-  if (MOUNTAINS.length > 0) return;
-  const colors = ['#0e0e1a', '#121220', '#0c0c18', '#141425'];
-  let x = -200;
-  while (x < 4000) {
-    const w = 150 + seededRandom(x * 0.01) * 300;
-    const h = 80 + seededRandom(x * 0.02) * 120;
-    MOUNTAINS.push({ x, width: w, height: h, color: colors[Math.floor(seededRandom(x * 0.03) * colors.length)] });
-    x += w * 0.6;
-  }
-}
-
-function drawMountainLayer(ctx: CanvasRenderingContext2D, camera: Camera): void {
-  initMountains();
-  const offsetX = camera.x * 0.2;
-  const baseY = camera.height * 0.65;
-
-  for (const m of MOUNTAINS) {
-    const mx = m.x - offsetX;
-    if (mx + m.width < -100 || mx > camera.width + 100) continue;
-
-    ctx.fillStyle = m.color;
-    ctx.beginPath();
-    ctx.moveTo(mx, baseY);
-    ctx.lineTo(mx + m.width * 0.5, baseY - m.height);
-    ctx.lineTo(mx + m.width, baseY);
-    ctx.closePath();
-    ctx.fill();
-  }
-}
-
-// ─── 树木层 ───────────────────────────────────────────────
-
-interface Tree {
-  x: number;
-  height: number;
-  type: 'tree' | 'dead_tree' | 'pillar';
-}
-
-const TREES: Tree[] = [];
-
-function initTrees(): void {
-  if (TREES.length > 0) return;
-  let x = -100;
-  while (x < 5000) {
-    const r = seededRandom(x * 0.05);
-    const type = r < 0.5 ? 'tree' : r < 0.75 ? 'dead_tree' : 'pillar';
-    TREES.push({ x, height: 40 + seededRandom(x * 0.06) * 80, type });
-    x += 30 + seededRandom(x * 0.07) * 80;
-  }
-}
-
-function drawTreeLayer(ctx: CanvasRenderingContext2D, camera: Camera): void {
-  initTrees();
-  const offsetX = camera.x * 0.5;
-  const baseY = camera.height * 0.78;
-
-  for (const tree of TREES) {
-    const tx = tree.x - offsetX;
-    if (tx + 30 < -50 || tx - 30 > camera.width + 50) continue;
-
-    const h = tree.height;
-    const rtx = Math.round(tx);
-    const rby = Math.round(baseY);
-
-    switch (tree.type) {
-      case 'tree':
-        ctx.fillStyle = '#1a1510';
-        ctx.fillRect(rtx - 3, rby - Math.round(h * 0.6), 6, Math.round(h * 0.6));
-        ctx.fillStyle = '#0e1a0e';
-        ctx.beginPath();
-        ctx.moveTo(tx, baseY - h);
-        ctx.lineTo(tx - 18, baseY - h * 0.4);
-        ctx.lineTo(tx + 18, baseY - h * 0.4);
-        ctx.closePath();
-        ctx.fill();
-        break;
-      case 'dead_tree':
-        ctx.fillStyle = '#1a1510';
-        ctx.fillRect(rtx - 2, rby - Math.round(h * 0.7), 4, Math.round(h * 0.7));
-        ctx.strokeStyle = '#1a1510';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(tx, baseY - h * 0.5);
-        ctx.lineTo(tx - 12, baseY - h * 0.7);
-        ctx.moveTo(tx, baseY - h * 0.6);
-        ctx.lineTo(tx + 10, baseY - h * 0.8);
-        ctx.stroke();
-        break;
-      case 'pillar':
-        ctx.fillStyle = '#1a1a22';
-        ctx.fillRect(rtx - 5, rby - Math.round(h), 10, Math.round(h));
-        ctx.fillStyle = '#222230';
-        ctx.fillRect(rtx - 8, rby - Math.round(h), 16, 6);
-        break;
-    }
-  }
-}
-
-// ─── 地面装饰 ─────────────────────────────────────────────
-
-interface GroundDecor {
-  wx: number;
-  wy: number;
-  type: number; // 0=stone, 1=crack, 2=grass
-  size: number;
-}
-
-const GROUND_DECORS: GroundDecor[] = [];
-
-function initGroundDecors(): void {
-  if (GROUND_DECORS.length > 0) return;
-  for (let i = 0; i < 100; i++) {
-    GROUND_DECORS.push({
-      wx: (seededRandom(i * 3 + 1) - 0.5) * 6000,
-      wy: (seededRandom(i * 3 + 2) - 0.5) * 6000,
-      type: Math.floor(seededRandom(i * 7 + 42) * 3),
-      size: 2 + seededRandom(i * 5) * 4,
-    });
-  }
-}
-
-function drawGroundDecors(ctx: CanvasRenderingContext2D, camera: Camera): void {
-  initGroundDecors();
-  const left = camera.x - 50;
-  const right = camera.x + camera.width + 50;
-  const top = camera.y - 50;
-  const bottom = camera.y + camera.height + 50;
-
-  for (const d of GROUND_DECORS) {
-    if (d.wx < left || d.wx > right || d.wy < top || d.wy > bottom) continue;
-    const dx = Math.round(d.wx);
-    const dy = Math.round(d.wy);
-    const s = d.size;
-
-    if (d.type === 0) {
-      ctx.fillStyle = '#3a3a45';
-      ctx.fillRect(dx - s, dy - s, s * 2, s * 2);
-    } else if (d.type === 1) {
-      ctx.strokeStyle = '#1a1a25';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(dx, dy);
-      ctx.lineTo(dx + s * 3, dy + s);
-      ctx.stroke();
-    } else {
-      ctx.fillStyle = '#1a2a1a';
-      ctx.fillRect(dx, dy - s * 2, 1, s * 2);
-      ctx.fillRect(dx + 2, dy - s, 1, s);
-    }
-  }
-}
-
-// ─── 主类 ─────────────────────────────────────────────────
 
 export class ParallaxBackground {
+  private layers: ParallaxLayer[] = [];
+  private _screenW = 0;
+  private _screenH = 0;
 
-  draw(ctx: CanvasRenderingContext2D, camera: Camera, _time: number): void {
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.imageSmoothingEnabled = false;
-
-    // 星空（预渲染，一次drawImage）
-    const sc = ensureStarCanvas(Math.ceil(camera.width), Math.ceil(camera.height));
-    ctx.drawImage(sc, 0, 0);
-
-    // 远山
-    drawMountainLayer(ctx, camera);
-
-    // 树木
-    drawTreeLayer(ctx, camera);
-
-    ctx.restore();
+  constructor(screenW: number, screenH: number) {
+    this._screenW = screenW;
+    this._screenH = screenH;
+    this._buildLayers();
   }
 
-  drawGroundDecorations(ctx: CanvasRenderingContext2D, camera: Camera): void {
-    drawGroundDecors(ctx, camera);
+  resize(w: number, h: number): void {
+    this._screenW = w;
+    this._screenH = h;
+    this._buildLayers();
+  }
+
+  private _buildLayers(): void {
+    this.layers = [];
+    // 远景：星空
+    this.layers.push({
+      canvas: this._renderStarfield(),
+      speed: 0.05,
+    });
+    // 中景：山丘
+    this.layers.push({
+      canvas: this._renderHills(),
+      speed: 0.2,
+    });
+    // 近景：树木
+    this.layers.push({
+      canvas: this._renderTrees(),
+      speed: 0.4,
+    });
+  }
+
+  private _renderStarfield(): HTMLCanvasElement {
+    const w = this._screenW + 200;
+    const h = this._screenH;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d')!;
+
+    // 深蓝背景
+    ctx.fillStyle = '#0a0a1a';
+    ctx.fillRect(0, 0, w, h);
+
+    // 星星
+    const rng = this._seededRandom(42);
+    for (let i = 0; i < 120; i++) {
+      const x = rng() * w;
+      const y = rng() * h * 0.7;
+      const s = rng() * 2 + 0.5;
+      const alpha = rng() * 0.5 + 0.3;
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fillRect(x, y, s, s);
+    }
+
+    return canvas;
+  }
+
+  private _renderHills(): HTMLCanvasElement {
+    const w = this._screenW + 400;
+    const h = this._screenH;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d')!;
+
+    ctx.fillStyle = '#1a1a3e';
+    ctx.fillRect(0, 0, w, h);
+
+    // 山丘轮廓
+    ctx.fillStyle = '#151530';
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x += 4) {
+      const y = h * 0.6 + Math.sin(x * 0.008) * 40 + Math.sin(x * 0.003) * 60;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(w, h);
+    ctx.fill();
+
+    ctx.fillStyle = '#121228';
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x += 4) {
+      const y = h * 0.7 + Math.sin(x * 0.006 + 1) * 30 + Math.sin(x * 0.002) * 50;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(w, h);
+    ctx.fill();
+
+    return canvas;
+  }
+
+  private _renderTrees(): HTMLCanvasElement {
+    const w = this._screenW + 600;
+    const h = this._screenH;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d')!;
+
+    ctx.fillStyle = '#0f0f22';
+    ctx.fillRect(0, 0, w, h);
+
+    const rng = this._seededRandom(99);
+    for (let i = 0; i < 30; i++) {
+      const x = rng() * w;
+      const treeH = rng() * 80 + 60;
+      const baseY = h * 0.75 + rng() * 30;
+
+      // 树干
+      ctx.fillStyle = '#2a1a0a';
+      ctx.fillRect(x - 3, baseY - treeH * 0.4, 6, treeH * 0.4);
+
+      // 树冠
+      ctx.fillStyle = `rgb(${10 + Math.floor(rng() * 20)},${20 + Math.floor(rng() * 30)},${10 + Math.floor(rng() * 15)})`;
+      ctx.beginPath();
+      ctx.moveTo(x, baseY - treeH);
+      ctx.lineTo(x - 20 - rng() * 15, baseY - treeH * 0.3);
+      ctx.lineTo(x + 20 + rng() * 15, baseY - treeH * 0.3);
+      ctx.fill();
+    }
+
+    return canvas;
+  }
+
+  private _seededRandom(seed: number): () => number {
+    let s = seed;
+    return () => {
+      s = (s * 16807 + 0) % 2147483647;
+      return s / 2147483647;
+    };
+  }
+
+  render(ctx: CanvasRenderingContext2D, cameraX: number, cameraY: number): void {
+    for (const layer of this.layers) {
+      const offsetX = -cameraX * layer.speed;
+      const offsetY = -cameraY * layer.speed * 0.3;
+      const lw = layer.canvas.width;
+
+      // 循环平铺
+      const startX = ((offsetX % lw) + lw) % lw - lw;
+      for (let x = startX; x < this._screenW; x += lw) {
+        ctx.drawImage(layer.canvas, x, offsetY);
+      }
+    }
   }
 }

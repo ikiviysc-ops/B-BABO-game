@@ -1,169 +1,300 @@
-/**
- * 升级系统 — 经验值积累 + 升级选择
- *
- * 幸存者类游戏核心循环：杀敌 → 获得XP → 升级 → 选择强化
- */
+// LevelUpSystem.ts - 升级系统
 
-import type { WeaponDef } from '@data/WeaponDefs';
-import { WEAPON_DEFS } from '@data/WeaponDefs';
+import { WEAPON_DEFS } from '../data/WeaponDefs';
 
-/** 升级选项 */
 export interface LevelUpOption {
   id: string;
   name: string;
-  description: string;
-  icon: string; // emoji for now
-  type: 'new_weapon' | 'upgrade_weapon' | 'stat_boost';
-  apply: (ctx: LevelUpContext) => void;
+  desc: string;
+  icon: string;
+  type: 'stat' | 'weapon' | 'weapon_upgrade';
+  apply: (context: LevelUpContext) => void;
 }
 
-/** 升级上下文 */
 export interface LevelUpContext {
-  weapons: { def: WeaponDef; level: number }[];
-  maxHp: number;
-  speed: number;
-  damageMultiplier: number;
+  /** 玩家属性(可修改) */
+  stats: {
+    maxHp: number;
+    speed: number;
+    damageMultiplier: number;
+    armor: number;
+    critChance: number;
+  };
+  /** 已拥有的武器ID列表 */
+  ownedWeapons: string[];
+  /** 武器等级 Map<weaponId, level> */
+  weaponLevels: Map<string, number>;
 }
 
-/** 升级系统状态 */
+/** 属性强化选项定义 */
+const STAT_OPTIONS: Omit<LevelUpOption, 'apply'>[] = [
+  {
+    id: 'hp_up',
+    name: '生命强化',
+    desc: '最大HP +20',
+    icon: 'heart',
+    type: 'stat',
+  },
+  {
+    id: 'speed_up',
+    name: '速度强化',
+    desc: '移速 +10%',
+    icon: 'boot',
+    type: 'stat',
+  },
+  {
+    id: 'damage_up',
+    name: '伤害强化',
+    desc: '伤害 +15%',
+    icon: 'sword',
+    type: 'stat',
+  },
+  {
+    id: 'armor_up',
+    name: '护甲强化',
+    desc: '护甲 +3',
+    icon: 'shield',
+    type: 'stat',
+  },
+  {
+    id: 'crit_up',
+    name: '暴击强化',
+    desc: '暴击率 +5%',
+    icon: 'star',
+    type: 'stat',
+  },
+];
+
+/** 所有可选武器(排除初始武器) */
+const UNLOCKABLE_WEAPONS = [
+  'sword', 'claw', 'bat', 'hammer',
+  'shuriken', 'ice_bow', 'fire_staff', 'pixel_gun', 'star_blaster',
+  'wand', 'thunder_spear', 'shadow_dagger', 'cotton_cannon', 'cosmic_ray',
+];
+
 export class LevelUpSystem {
-  private _xp = 0;
-  private _level = 1;
-  private _xpToNext = 20;
-  private _totalXp = 0;
+  /** 当前等级 */
+  level: number = 1;
+  /** 当前经验值 */
+  xp: number = 0;
+  /** 升级所需经验 */
+  xpToNext: number = 20;
+  /** 是否有待处理的升级 */
+  pendingLevelUp: boolean = false;
+  /** 当前可选选项 */
+  options: LevelUpOption[] = [];
+  /** 玩家上下文 */
+  private context: LevelUpContext;
 
-  /** 升级选择状态 */
-  private _pendingLevelUp = false;
-  private _options: LevelUpOption[] = [];
-  private _selectedIndex = -1;
+  constructor() {
+    this.context = {
+      stats: {
+        maxHp: 100,
+        speed: 200,
+        damageMultiplier: 1.0,
+        armor: 0,
+        critChance: 5,
+      },
+      ownedWeapons: [],
+      weaponLevels: new Map(),
+    };
+  }
 
-  /** 属性加成 */
-  private _bonusMaxHp = 0;
-  private _bonusSpeed = 0;
-  private _damageMultiplier = 1;
-
-  get xp(): number { return this._xp; }
-  get level(): number { return this._level; }
-  get xpToNext(): number { return this._xpToNext; }
-  get pendingLevelUp(): boolean { return this._pendingLevelUp; }
-  get options(): readonly LevelUpOption[] { return this._options; }
-  get selectedIndex(): number { return this._selectedIndex; }
-  get bonusMaxHp(): number { return this._bonusMaxHp; }
-  get bonusSpeed(): number { return this._bonusSpeed; }
-  get damageMultiplier(): number { return this._damageMultiplier; }
-
-  /** 增加经验值 */
+  /**
+   * 添加经验值
+   * @param amount 经验值
+   * @returns 是否升级
+   */
   addXp(amount: number): boolean {
-    this._xp += amount;
-    this._totalXp += amount;
+    this.xp += amount;
 
-    if (this._xp >= this._xpToNext) {
-      this._xp -= this._xpToNext;
-      this._level++;
-      this._xpToNext = Math.floor(20 * Math.pow(1.15, this._level - 1));
-      this.generateOptions();
-      this._pendingLevelUp = true;
+    if (this.xp >= this.xpToNext) {
+      this.xp -= this.xpToNext;
+      this.level++;
+      this.xpToNext = Math.floor(20 * Math.pow(1.3, this.level - 1));
+      this.pendingLevelUp = true;
+      this.options = this.generateOptions();
       return true;
     }
+
     return false;
   }
 
-  /** 生成3个升级选项 */
-  private generateOptions(): void {
-    this._options = [];
-    this._selectedIndex = -1;
-
-    const allOptions = this.buildOptionPool();
-
-    // 随机选3个不重复的
-    const shuffled = allOptions.sort(() => Math.random() - 0.5);
-    for (let i = 0; i < Math.min(3, shuffled.length); i++) {
-      this._options.push(shuffled[i]);
-    }
-  }
-
-  /** 构建可选升级池 */
-  private buildOptionPool(): LevelUpOption[] {
+  /**
+   * 生成3个升级选项
+   */
+  generateOptions(): LevelUpOption[] {
     const pool: LevelUpOption[] = [];
 
-    // 属性强化（始终可用）
-    pool.push({
-      id: 'hp_boost', name: '生命强化', description: '最大HP +20',
-      icon: 'hp_boost', type: 'stat_boost',
-      apply: () => { this._bonusMaxHp += 20; },
-    });
-    pool.push({
-      id: 'speed_boost', name: '疾步', description: '移动速度 +15%',
-      icon: 'speed_boost', type: 'stat_boost',
-      apply: () => { this._bonusSpeed += 15; },
-    });
-    pool.push({
-      id: 'damage_boost', name: '力量', description: '全伤害 +10%',
-      icon: 'damage_boost', type: 'stat_boost',
-      apply: () => { this._damageMultiplier += 0.1; },
-    });
-
-    // 新武器（随机3把）
-    const weaponEntries = Array.from(WEAPON_DEFS.values());
-    const shuffledWeapons = weaponEntries.sort(() => Math.random() - 0.5);
-    for (let i = 0; i < Math.min(3, shuffledWeapons.length); i++) {
-      const w = shuffledWeapons[i];
-      const typeLabel = w.type === 'melee' ? '近战' : w.type === 'ranged' ? '远程' : '特殊';
-      const desc = this.buildWeaponDesc(w);
+    // 1. 属性强化选项(始终可用)
+    for (const statOpt of STAT_OPTIONS) {
       pool.push({
-        id: `new_${w.id}`, name: w.name,
-        description: `${typeLabel} | ${desc}`,
-        icon: w.id,
-        type: 'new_weapon',
-        apply: () => {},
-        _weaponDef: w,
-      } as LevelUpOption & { _weaponDef: WeaponDef });
+        ...statOpt,
+        apply: (ctx) => {
+          switch (statOpt.id) {
+            case 'hp_up':
+              ctx.stats.maxHp += 20;
+              break;
+            case 'speed_up':
+              ctx.stats.speed = Math.floor(ctx.stats.speed * 1.1);
+              break;
+            case 'damage_up':
+              ctx.stats.damageMultiplier += 0.15;
+              break;
+            case 'armor_up':
+              ctx.stats.armor += 3;
+              break;
+            case 'crit_up':
+              ctx.stats.critChance += 5;
+              break;
+          }
+        },
+      });
     }
 
-    return pool;
+    // 2. 新武器选项(未拥有的武器)
+    const availableWeapons = UNLOCKABLE_WEAPONS.filter(
+      id => !this.context.ownedWeapons.includes(id)
+    );
+    for (const weaponId of availableWeapons) {
+      const def = WEAPON_DEFS.get(weaponId);
+      if (!def) continue;
+      pool.push({
+        id: `weapon_${weaponId}`,
+        name: `新武器: ${def.name}`,
+        desc: `获得${def.name} (${def.type === 'melee' ? '近战' : def.type === 'ranged' ? '远程' : '特殊'})`,
+        icon: 'weapon',
+        type: 'weapon',
+        apply: (ctx) => {
+          ctx.ownedWeapons.push(weaponId);
+          ctx.weaponLevels.set(weaponId, 1);
+        },
+      });
+    }
+
+    // 3. 武器升级选项(已拥有的武器)
+    for (const weaponId of this.context.ownedWeapons) {
+      const def = WEAPON_DEFS.get(weaponId);
+      if (!def) continue;
+      const currentLevel = this.context.weaponLevels.get(weaponId) ?? 1;
+      if (currentLevel >= 5) continue; // 最高5级
+
+      pool.push({
+        id: `upgrade_${weaponId}`,
+        name: `${def.name} Lv.${currentLevel + 1}`,
+        desc: `伤害+20%, 攻速+10%`,
+        icon: 'upgrade',
+        type: 'weapon_upgrade',
+        apply: (ctx) => {
+          ctx.weaponLevels.set(weaponId, currentLevel + 1);
+          // 伤害和攻速加成通过weaponLevels查询应用
+        },
+      });
+    }
+
+    // 从池中随机选3个(不重复类型优先)
+    const selected: LevelUpOption[] = [];
+    const usedTypes = new Set<string>();
+
+    // 优先每种类型选一个
+    const typeOrder: string[] = ['stat', 'weapon', 'weapon_upgrade'];
+    for (const type of typeOrder) {
+      const candidates = pool.filter(o => o.type === type && !usedTypes.has(o.id));
+      if (candidates.length > 0) {
+        const pick = candidates[Math.floor(Math.random() * candidates.length)];
+        selected.push(pick);
+        usedTypes.add(pick.id);
+      }
+    }
+
+    // 补足到3个
+    while (selected.length < 3 && pool.length > 0) {
+      const remaining = pool.filter(o => !usedTypes.has(o.id));
+      if (remaining.length === 0) break;
+      const pick = remaining[Math.floor(Math.random() * remaining.length)];
+      selected.push(pick);
+      usedTypes.add(pick.id);
+    }
+
+    return selected.slice(0, 3);
   }
 
-  /** 生成武器描述 */
-  private buildWeaponDesc(w: WeaponDef): string {
-    const parts: string[] = [];
-    parts.push(`伤害${w.damage}`);
-    parts.push(`攻速${w.fireRate}/s`);
-    if (w.type !== 'melee') {
-      parts.push(`射程${w.range}`);
+  /**
+   * 选择升级选项
+   * @param index 选项索引(0-2)
+   * @returns 选中的选项
+   */
+  selectOption(index: number): LevelUpOption {
+    if (index < 0 || index >= this.options.length) {
+      throw new Error(`Invalid option index: ${index}`);
     }
-    if (w.pierce && w.pierce > 0) parts.push(`穿透${w.pierce}`);
-    if (w.aoe && w.aoe > 0) parts.push(`爆炸${w.aoe}px`);
-    if (w.tracking) parts.push('追踪');
-    if (w.projectileCount && w.projectileCount > 1) parts.push(`${w.projectileCount}发散`);
-    if (w.element) {
-      const elMap: Record<string, string> = { fire: '🔥火', ice: '❄️冰', thunder: '⚡雷', nature: '🌿自然' };
-      parts.push(elMap[w.element] || w.element);
-    }
-    if (w.special) parts.push(w.special);
-    return parts.join(' ');
-  }
 
-  /** 选择升级选项 */
-  selectOption(index: number): LevelUpOption | null {
-    if (index < 0 || index >= this._options.length) return null;
-    this._selectedIndex = index;
-    const option = this._options[index];
-    option.apply({} as LevelUpContext);
-    this._pendingLevelUp = false;
+    const option = this.options[index];
+    option.apply(this.context);
+    this.pendingLevelUp = false;
+    this.options = [];
+
+    // 检查是否还有待处理的经验(连续升级)
+    if (this.xp >= this.xpToNext) {
+      this.xp -= this.xpToNext;
+      this.level++;
+      this.xpToNext = Math.floor(20 * Math.pow(1.3, this.level - 1));
+      this.pendingLevelUp = true;
+      this.options = this.generateOptions();
+    }
+
     return option;
   }
 
-  /** 重置 */
+  /**
+   * 获取玩家上下文(只读副本)
+   */
+  getContext(): Readonly<LevelUpContext> {
+    return this.context;
+  }
+
+  /**
+   * 获取武器伤害倍率
+   */
+  getWeaponDamageMultiplier(weaponId: string): number {
+    const level = this.context.weaponLevels.get(weaponId) ?? 1;
+    return this.context.stats.damageMultiplier * (1 + (level - 1) * 0.2);
+  }
+
+  /**
+   * 获取武器攻速倍率
+   */
+  getWeaponFireRateMultiplier(weaponId: string): number {
+    const level = this.context.weaponLevels.get(weaponId) ?? 1;
+    return 1 / (1 + (level - 1) * 0.1);
+  }
+
+  /**
+   * 获取经验进度(0-1)
+   */
+  getXpProgress(): number {
+    return this.xp / this.xpToNext;
+  }
+
+  /**
+   * 重置
+   */
   reset(): void {
-    this._xp = 0;
-    this._level = 1;
-    this._xpToNext = 20;
-    this._totalXp = 0;
-    this._pendingLevelUp = false;
-    this._options = [];
-    this._selectedIndex = -1;
-    this._bonusMaxHp = 0;
-    this._bonusSpeed = 0;
-    this._damageMultiplier = 1;
+    this.level = 1;
+    this.xp = 0;
+    this.xpToNext = 20;
+    this.pendingLevelUp = false;
+    this.options = [];
+    this.context = {
+      stats: {
+        maxHp: 100,
+        speed: 200,
+        damageMultiplier: 1.0,
+        armor: 0,
+        critChance: 5,
+      },
+      ownedWeapons: [],
+      weaponLevels: new Map(),
+    };
   }
 }

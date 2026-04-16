@@ -1,21 +1,21 @@
-/**
- * B-BABO幸存者：无尽深渊
- * 像素风Roguelike生存射击游戏 - 入口
- */
+// main.ts - 入口文件
 
-import { Game } from '@core/Game';
+import { Game } from './core/Game';
 
-// 等待 DOM 就绪
-window.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+function bootstrap(): void {
+  const canvas = document.getElementById('c') as HTMLCanvasElement;
   if (!canvas) {
-    console.error('[B-BABO] Canvas element not found!');
+    console.error('[main] Canvas element #c not found');
     return;
   }
 
   const game = new Game(canvas);
   game.start();
+}
 
-  // 暴露到 window 用于调试
-  (window as any).__GAME__ = game;
-});
+// DOMContentLoaded 或直接执行
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrap);
+} else {
+  bootstrap();
+}

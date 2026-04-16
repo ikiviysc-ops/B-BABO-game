@@ -1,86 +1,54 @@
-/**
- * UI 主题常量 — 统一颜色、布局、动画参数
- * 参考 Vampire Survivors 暗色调风格
- */
+// UITheme.ts - Design Tokens常量
 
-// ═══════════════════════════════════════════════════════
 // 颜色系统
-// ═══════════════════════════════════════════════════════
-
-export const UI = {
-  /** 背景色 */
-  bg: {
-    overlay: 'rgba(0,0,0,0.65)',
-    primary: '#0a0a1a',
-    secondary: '#12122a',
-    tertiary: '#1a1a3a',
-  },
-
-  /** 文字色 */
-  text: {
-    primary: '#e8e8f0',
-    secondary: '#a0a0b8',
-    tertiary: '#6868888',
-    gold: '#ffd700',
-    xp: '#88ccff',
-  },
-
-  /** 强调色 */
-  accent: {
-    red: '#ff4444',
-    green: '#44ff88',
-    blue: '#4488ff',
-    gold: '#ffcc00',
-  },
-
-  /** 面板 */
-  panel: {
-    border: 'rgba(255,255,255,0.08)',
-    borderStrong: 'rgba(255,255,255,0.15)',
-    bg: 'rgba(20,20,50,0.9)',
-  },
-
-  /** 进度条 */
-  bar: {
-    xp: {
-      bg: '#1a1a3a',
-      fill: '#2266cc',
-      hi: '#44aaff',
-      border: '#334466',
-    },
-    hp: {
-      bg: '#2a0a0a',
-      fill: '#cc2222',
-      hi: '#ff4444',
-      border: '#442222',
-    },
-  },
+export const COLORS = {
+  bg: '#1a1a2e',
+  bgDark: '#0f0f1a',
+  bgLight: '#252540',
+  text: '#e0e0e0',
+  textDim: '#888899',
+  accent: '#e94560',
+  accentLight: '#ff6b81',
+  bar: '#16213e',
+  barFill: '#0f3460',
+  panel: '#1e1e36',
+  panelBorder: '#2a2a4a',
+  hp: '#e94560',
+  hpBg: '#4a1525',
+  mp: '#4361ee',
+  mpBg: '#1a2555',
+  xp: '#00ff88',
+  xpBg: '#0a3322',
+  gold: '#ffd700',
+  white: '#ffffff',
+  black: '#000000',
 } as const;
 
-// ═══════════════════════════════════════════════════════
-// HUD 布局常量
-// ═══════════════════════════════════════════════════════
+// 稀有度颜色
+export const RARITY = {
+  SSR: { color: '#ffd700', glow: '#ffd70066', name: 'SSR' },
+  SR:  { color: '#c850c0', glow: '#c850c066', name: 'SR' },
+  R:   { color: '#4361ee', glow: '#4361ee66', name: 'R' },
+  N:   { color: '#888899', glow: '#88889944', name: 'N' },
+} as const;
 
+export type RarityKey = keyof typeof RARITY;
+
+// HUD布局
 export const HUD = {
-  xpBarHeight: 8,
-  timerSize: 16,
-  statsSize: 14,
+  top: 16,
+  left: 16,
+  right: 16,
+  bottom: 16,
+  barWidth: 200,
+  barHeight: 16,
+  barGap: 6,
+  iconSize: 24,
+  fontSize: 14,
+  levelBadge: { size: 32, radius: 16 },
 } as const;
 
-// ═══════════════════════════════════════════════════════
-// 武器槽位
-// ═══════════════════════════════════════════════════════
-
-export const WEAPON_SLOT = {
-  size: 40,
-  gap: 4,
-  cols: 6,
-} as const;
-
-// ═══════════════════════════════════════════════════════
 // 卡片布局
-// ═══════════════════════════════════════════════════════
-
 export const CARD = {
   width: 160,
   height: 220,
@@ -88,25 +56,46 @@ export const CARD = {
   padding: 12,
   radius: 8,
   iconSize: 48,
+  titleSize: 13,
+  descSize: 11,
+  rarityBorder: 3,
 } as const;
 
-// ═══════════════════════════════════════════════════════
-// 动画
-// ═══════════════════════════════════════════════════════
-
-export const duration = {
-  fast: 150,
-  normal: 300,
-  slow: 600,
-} as const;
-
-export const easing = {
-  easeOutBack: (t: number): number => {
+// 动画easing
+export const Easing = {
+  easeOutBack(t: number): number {
     const c1 = 1.70158;
     const c3 = c1 + 1;
     return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
   },
-  easeOutCubic: (t: number): number => 1 - Math.pow(1 - t, 3),
-  easeInOutQuad: (t: number): number =>
-    t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
-};
+  easeOutQuad(t: number): number {
+    return 1 - (1 - t) * (1 - t);
+  },
+  easeInOutSine(t: number): number {
+    return -(Math.cos(Math.PI * t) - 1) / 2;
+  },
+  linear(t: number): number {
+    return t;
+  },
+} as const;
+
+// 动画duration常量（秒）
+export const DURATION = {
+  fast: 0.15,
+  normal: 0.3,
+  slow: 0.5,
+  cardFlip: 0.4,
+  cardDeal: 0.3,
+  levelUp: 1.0,
+  fadeIn: 0.2,
+  fadeOut: 0.3,
+  shake: 0.2,
+  pulse: 0.6,
+} as const;
+
+// 字体
+export const FONT = {
+  pixel: '"Press Start 2P", monospace',
+  ui: '"Noto Sans SC", sans-serif',
+  mono: '"Fira Code", monospace',
+} as const;
