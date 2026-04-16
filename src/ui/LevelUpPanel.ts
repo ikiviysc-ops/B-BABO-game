@@ -66,17 +66,9 @@ export class LevelUpPanel {
       const opt = options[i];
       const x = startX + i * (cardW + gap);
 
-      // 弹入动画（依次延迟）
-      const cardDelay = i * 80;
-      const cardProgress = Math.max(0, Math.min((this.animTimer - cardDelay) / 300, 1));
-      if (cardProgress <= 0) continue;
-
-      const cardEased = easing.easeOutBack(cardProgress);
-      const cardOffsetY = (1 - cardEased) * 100 * dpr;
-
+      // 卡片立即显示（无延迟）
       ctx.save();
-      ctx.translate(0, cardOffsetY);
-      ctx.globalAlpha = cardProgress;
+      ctx.globalAlpha = 1;
 
       this.renderCard(ctx, opt, x, startY, cardW, cardH, i);
 
