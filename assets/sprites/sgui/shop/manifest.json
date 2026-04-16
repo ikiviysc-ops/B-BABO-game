@@ -1,0 +1,88 @@
+{
+  "source_mph": "shop.mph",
+  "source_mpd": "shop_0.mpd",
+  "mode": "advance",
+  "frame_count": 10,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "shop_0.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "shop_1.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "shop_2.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "shop_3.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "shop_4.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "shop_5.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "shop_6.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "shop_7.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "shop_8.png",
+      "width": 33,
+      "height": 16,
+      "tag_flags": 8856
+    },
+    {
+      "index": 9,
+      "part_no": 0,
+      "file": "shop_9.png",
+      "width": 33,
+      "height": 16,
+      "tag_flags": 8856
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "source_mph": "3.mph",
+  "source_mpd": "3_0.mpd",
+  "mode": "basic",
+  "frame_count": 13,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "3_0.png",
+      "width": 11,
+      "height": 9,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "3_1.png",
+      "width": 25,
+      "height": 22,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "3_2.png",
+      "width": 32,
+      "height": 33,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "3_3.png",
+      "width": 88,
+      "height": 96,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "3_4.png",
+      "width": 49,
+      "height": 11,
+      "tag_flags": 152
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "3_5.png",
+      "width": 43,
+      "height": 51,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "3_6.png",
+      "width": 61,
+      "height": 54,
+      "tag_flags": 152
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "3_7.png",
+      "width": 85,
+      "height": 74,
+      "tag_flags": 152
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "3_8.png",
+      "width": 50,
+      "height": 58,
+      "tag_flags": 152
+    },
+    {
+      "index": 9,
+      "part_no": 0,
+      "file": "3_9.png",
+      "width": 149,
+      "height": 53,
+      "tag_flags": 152
+    },
+    {
+      "index": 10,
+      "part_no": 0,
+      "file": "3_10.png",
+      "width": 50,
+      "height": 58,
+      "tag_flags": 152
+    },
+    {
+      "index": 11,
+      "part_no": 0,
+      "file": "3_11.png",
+      "width": 88,
+      "height": 36,
+      "tag_flags": 152
+    },
+    {
+      "index": 12,
+      "part_no": 0,
+      "file": "3_12.png",
+      "width": 89,
+      "height": 36,
+      "tag_flags": 152
+    }
+  ]
+}

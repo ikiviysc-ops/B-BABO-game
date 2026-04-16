@@ -1,0 +1,88 @@
+{
+  "source_mph": "1.mph",
+  "source_mpd": "1_0.mpd",
+  "mode": "basic",
+  "frame_count": 10,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "1_0.png",
+      "width": 56,
+      "height": 25,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "1_1.png",
+      "width": 91,
+      "height": 93,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "1_2.png",
+      "width": 43,
+      "height": 71,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "1_3.png",
+      "width": 32,
+      "height": 52,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "1_4.png",
+      "width": 25,
+      "height": 48,
+      "tag_flags": 152
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "1_5.png",
+      "width": 21,
+      "height": 27,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "1_6.png",
+      "width": 47,
+      "height": 36,
+      "tag_flags": 152
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "1_7.png",
+      "width": 31,
+      "height": 38,
+      "tag_flags": 152
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "1_8.png",
+      "width": 41,
+      "height": 35,
+      "tag_flags": 152
+    },
+    {
+      "index": 9,
+      "part_no": 0,
+      "file": "1_9.png",
+      "width": 47,
+      "height": 51,
+      "tag_flags": 152
+    }
+  ]
+}

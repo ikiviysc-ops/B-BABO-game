@@ -1,0 +1,56 @@
+{
+  "source_mph": "lvup.mph",
+  "source_mpd": "lvup_0.mpd",
+  "mode": "advance",
+  "frame_count": 6,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "lvup_0.png",
+      "width": 10,
+      "height": 5,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "lvup_1.png",
+      "width": 22,
+      "height": 8,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "lvup_2.png",
+      "width": 12,
+      "height": 12,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "lvup_3.png",
+      "width": 1,
+      "height": 20,
+      "tag_flags": 136
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "lvup_4.png",
+      "width": 1,
+      "height": 12,
+      "tag_flags": 136
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "lvup_5.png",
+      "width": 1,
+      "height": 5,
+      "tag_flags": 136
+    }
+  ]
+}

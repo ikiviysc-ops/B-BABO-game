@@ -1,0 +1,119 @@
+{
+  "pack": "enm_17",
+  "category": "enm",
+  "source_pack": "17",
+  "frame_count": 11,
+  "sheet_width": 276,
+  "sheet_height": 52,
+  "scale": 2,
+  "frames": [
+    {
+      "x": 0,
+      "y": 5,
+      "width": 8,
+      "height": 42
+    },
+    {
+      "x": 8,
+      "y": 22,
+      "width": 36,
+      "height": 8
+    },
+    {
+      "x": 44,
+      "y": 3,
+      "width": 30,
+      "height": 46
+    },
+    {
+      "x": 74,
+      "y": 17,
+      "width": 16,
+      "height": 18
+    },
+    {
+      "x": 90,
+      "y": 5,
+      "width": 30,
+      "height": 42
+    },
+    {
+      "x": 120,
+      "y": 16,
+      "width": 16,
+      "height": 20
+    },
+    {
+      "x": 136,
+      "y": 0,
+      "width": 30,
+      "height": 52
+    },
+    {
+      "x": 166,
+      "y": 0,
+      "width": 26,
+      "height": 52
+    },
+    {
+      "x": 192,
+      "y": 3,
+      "width": 32,
+      "height": 46
+    },
+    {
+      "x": 224,
+      "y": 19,
+      "width": 20,
+      "height": 14
+    },
+    {
+      "x": 244,
+      "y": 0,
+      "width": 32,
+      "height": 52
+    }
+  ],
+  "animations": {
+    "walk": {
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameRate": 6,
+      "repeat": -1
+    },
+    "attack": {
+      "frames": [
+        4,
+        5
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    "hurt": {
+      "frames": [
+        6
+      ],
+      "frameRate": 4,
+      "repeat": 0
+    },
+    "death": {
+      "frames": [
+        7
+      ],
+      "frameRate": 4,
+      "repeat": 0
+    },
+    "idle": {
+      "frames": [
+        0,
+        1
+      ],
+      "frameRate": 3,
+      "repeat": -1
+    }
+  }
+}

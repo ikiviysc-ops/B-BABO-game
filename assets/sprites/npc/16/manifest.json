@@ -1,0 +1,112 @@
+{
+  "source_mph": "16.mph",
+  "source_mpd": "16_0.mpd",
+  "mode": "advance",
+  "frame_count": 13,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "16_0.png",
+      "width": 15,
+      "height": 27,
+      "tag_flags": 8856
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "16_1.png",
+      "width": 15,
+      "height": 26,
+      "tag_flags": 8856
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "16_2.png",
+      "width": 15,
+      "height": 27,
+      "tag_flags": 8856
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "16_3.png",
+      "width": 15,
+      "height": 26,
+      "tag_flags": 8856
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "16_4.png",
+      "width": 15,
+      "height": 27,
+      "tag_flags": 8856
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "16_5.png",
+      "width": 15,
+      "height": 26,
+      "tag_flags": 8856
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "16_6.png",
+      "width": 15,
+      "height": 25,
+      "tag_flags": 8856
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "16_7.png",
+      "width": 15,
+      "height": 26,
+      "tag_flags": 8856
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "16_8.png",
+      "width": 12,
+      "height": 27,
+      "tag_flags": 8856
+    },
+    {
+      "index": 9,
+      "part_no": 0,
+      "file": "16_9.png",
+      "width": 12,
+      "height": 26,
+      "tag_flags": 8856
+    },
+    {
+      "index": 10,
+      "part_no": 0,
+      "file": "16_10.png",
+      "width": 12,
+      "height": 25,
+      "tag_flags": 8856
+    },
+    {
+      "index": 11,
+      "part_no": 0,
+      "file": "16_11.png",
+      "width": 12,
+      "height": 26,
+      "tag_flags": 8856
+    },
+    {
+      "index": 12,
+      "part_no": 0,
+      "file": "16_12.png",
+      "width": 14,
+      "height": 10,
+      "tag_flags": 8856
+    }
+  ]
+}

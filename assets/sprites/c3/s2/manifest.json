@@ -1,0 +1,24 @@
+{
+  "source_mph": "s2.mph",
+  "source_mpd": "s2_0.mpd",
+  "mode": "advance",
+  "frame_count": 2,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "s2_0.png",
+      "width": 6,
+      "height": 18,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "s2_1.png",
+      "width": 11,
+      "height": 18,
+      "tag_flags": 152
+    }
+  ]
+}

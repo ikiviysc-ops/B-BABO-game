@@ -1,0 +1,1355 @@
+{
+  "generated_at": "2026-04-16T14:23:19.336548",
+  "game": "Heroes Lore",
+  "assets_root": "assets",
+  "summary": {
+    "sprite_packs": 144,
+    "sprite_frames": 1174,
+    "maps": 81,
+    "tdf_files": 19,
+    "fonts": 2
+  },
+  "sprites": {
+    "enm": [
+      {
+        "name": "00",
+        "frames": 6,
+        "manifest": "assets/sprites/enm/00/manifest.json"
+      },
+      {
+        "name": "01",
+        "frames": 6,
+        "manifest": "assets/sprites/enm/01/manifest.json"
+      },
+      {
+        "name": "02",
+        "frames": 7,
+        "manifest": "assets/sprites/enm/02/manifest.json"
+      },
+      {
+        "name": "03",
+        "frames": 8,
+        "manifest": "assets/sprites/enm/03/manifest.json"
+      },
+      {
+        "name": "04",
+        "frames": 7,
+        "manifest": "assets/sprites/enm/04/manifest.json"
+      },
+      {
+        "name": "05",
+        "frames": 5,
+        "manifest": "assets/sprites/enm/05/manifest.json"
+      },
+      {
+        "name": "06",
+        "frames": 5,
+        "manifest": "assets/sprites/enm/06/manifest.json"
+      },
+      {
+        "name": "07",
+        "frames": 6,
+        "manifest": "assets/sprites/enm/07/manifest.json"
+      },
+      {
+        "name": "08",
+        "frames": 8,
+        "manifest": "assets/sprites/enm/08/manifest.json"
+      },
+      {
+        "name": "09",
+        "frames": 7,
+        "manifest": "assets/sprites/enm/09/manifest.json"
+      },
+      {
+        "name": "10",
+        "frames": 8,
+        "manifest": "assets/sprites/enm/10/manifest.json"
+      },
+      {
+        "name": "11",
+        "frames": 5,
+        "manifest": "assets/sprites/enm/11/manifest.json"
+      },
+      {
+        "name": "12",
+        "frames": 14,
+        "manifest": "assets/sprites/enm/12/manifest.json"
+      },
+      {
+        "name": "13",
+        "frames": 10,
+        "manifest": "assets/sprites/enm/13/manifest.json"
+      },
+      {
+        "name": "14",
+        "frames": 4,
+        "manifest": "assets/sprites/enm/14/manifest.json"
+      },
+      {
+        "name": "15",
+        "frames": 4,
+        "manifest": "assets/sprites/enm/15/manifest.json"
+      },
+      {
+        "name": "16",
+        "frames": 14,
+        "manifest": "assets/sprites/enm/16/manifest.json"
+      },
+      {
+        "name": "17",
+        "frames": 11,
+        "manifest": "assets/sprites/enm/17/manifest.json"
+      },
+      {
+        "name": "18",
+        "frames": 11,
+        "manifest": "assets/sprites/enm/18/manifest.json"
+      },
+      {
+        "name": "19",
+        "frames": 11,
+        "manifest": "assets/sprites/enm/19/manifest.json"
+      },
+      {
+        "name": "20",
+        "frames": 11,
+        "manifest": "assets/sprites/enm/20/manifest.json"
+      },
+      {
+        "name": "21",
+        "frames": 6,
+        "manifest": "assets/sprites/enm/21/manifest.json"
+      },
+      {
+        "name": "22",
+        "frames": 7,
+        "manifest": "assets/sprites/enm/22/manifest.json"
+      },
+      {
+        "name": "23",
+        "frames": 6,
+        "manifest": "assets/sprites/enm/23/manifest.json"
+      },
+      {
+        "name": "24",
+        "frames": 4,
+        "manifest": "assets/sprites/enm/24/manifest.json"
+      },
+      {
+        "name": "25",
+        "frames": 5,
+        "manifest": "assets/sprites/enm/25/manifest.json"
+      },
+      {
+        "name": "26",
+        "frames": 6,
+        "manifest": "assets/sprites/enm/26/manifest.json"
+      },
+      {
+        "name": "27",
+        "frames": 12,
+        "manifest": "assets/sprites/enm/27/manifest.json"
+      },
+      {
+        "name": "28",
+        "frames": 5,
+        "manifest": "assets/sprites/enm/28/manifest.json"
+      },
+      {
+        "name": "29",
+        "frames": 5,
+        "manifest": "assets/sprites/enm/29/manifest.json"
+      },
+      {
+        "name": "30",
+        "frames": 8,
+        "manifest": "assets/sprites/enm/30/manifest.json"
+      },
+      {
+        "name": "31",
+        "frames": 8,
+        "manifest": "assets/sprites/enm/31/manifest.json"
+      }
+    ],
+    "boss": [
+      {
+        "name": "1",
+        "frames": 10,
+        "manifest": "assets/sprites/boss/1/manifest.json"
+      },
+      {
+        "name": "2",
+        "frames": 17,
+        "manifest": "assets/sprites/boss/2/manifest.json"
+      },
+      {
+        "name": "3",
+        "frames": 13,
+        "manifest": "assets/sprites/boss/3/manifest.json"
+      },
+      {
+        "name": "4",
+        "frames": 3,
+        "manifest": "assets/sprites/boss/4/manifest.json"
+      }
+    ],
+    "c1": [
+      {
+        "name": "a1",
+        "frames": 7,
+        "manifest": "assets/sprites/c1/a1/manifest.json"
+      },
+      {
+        "name": "a2",
+        "frames": 7,
+        "manifest": "assets/sprites/c1/a2/manifest.json"
+      },
+      {
+        "name": "a3",
+        "frames": 7,
+        "manifest": "assets/sprites/c1/a3/manifest.json"
+      },
+      {
+        "name": "a4",
+        "frames": 7,
+        "manifest": "assets/sprites/c1/a4/manifest.json"
+      },
+      {
+        "name": "a5",
+        "frames": 7,
+        "manifest": "assets/sprites/c1/a5/manifest.json"
+      },
+      {
+        "name": "a6",
+        "frames": 7,
+        "manifest": "assets/sprites/c1/a6/manifest.json"
+      },
+      {
+        "name": "b",
+        "frames": 26,
+        "manifest": "assets/sprites/c1/b/manifest.json"
+      },
+      {
+        "name": "e",
+        "frames": 22,
+        "manifest": "assets/sprites/c1/e/manifest.json"
+      },
+      {
+        "name": "h1",
+        "frames": 6,
+        "manifest": "assets/sprites/c1/h1/manifest.json"
+      },
+      {
+        "name": "h2",
+        "frames": 6,
+        "manifest": "assets/sprites/c1/h2/manifest.json"
+      },
+      {
+        "name": "h3",
+        "frames": 6,
+        "manifest": "assets/sprites/c1/h3/manifest.json"
+      },
+      {
+        "name": "h4",
+        "frames": 6,
+        "manifest": "assets/sprites/c1/h4/manifest.json"
+      },
+      {
+        "name": "h5",
+        "frames": 6,
+        "manifest": "assets/sprites/c1/h5/manifest.json"
+      },
+      {
+        "name": "h6",
+        "frames": 6,
+        "manifest": "assets/sprites/c1/h6/manifest.json"
+      },
+      {
+        "name": "h7",
+        "frames": 6,
+        "manifest": "assets/sprites/c1/h7/manifest.json"
+      },
+      {
+        "name": "w1",
+        "frames": 4,
+        "manifest": "assets/sprites/c1/w1/manifest.json"
+      },
+      {
+        "name": "w2",
+        "frames": 4,
+        "manifest": "assets/sprites/c1/w2/manifest.json"
+      },
+      {
+        "name": "w3",
+        "frames": 4,
+        "manifest": "assets/sprites/c1/w3/manifest.json"
+      },
+      {
+        "name": "w4",
+        "frames": 4,
+        "manifest": "assets/sprites/c1/w4/manifest.json"
+      },
+      {
+        "name": "w5",
+        "frames": 4,
+        "manifest": "assets/sprites/c1/w5/manifest.json"
+      }
+    ],
+    "c2": [
+      {
+        "name": "a1",
+        "frames": 7,
+        "manifest": "assets/sprites/c2/a1/manifest.json"
+      },
+      {
+        "name": "a2",
+        "frames": 7,
+        "manifest": "assets/sprites/c2/a2/manifest.json"
+      },
+      {
+        "name": "a3",
+        "frames": 7,
+        "manifest": "assets/sprites/c2/a3/manifest.json"
+      },
+      {
+        "name": "a4",
+        "frames": 7,
+        "manifest": "assets/sprites/c2/a4/manifest.json"
+      },
+      {
+        "name": "a5",
+        "frames": 7,
+        "manifest": "assets/sprites/c2/a5/manifest.json"
+      },
+      {
+        "name": "a6",
+        "frames": 7,
+        "manifest": "assets/sprites/c2/a6/manifest.json"
+      },
+      {
+        "name": "b",
+        "frames": 27,
+        "manifest": "assets/sprites/c2/b/manifest.json"
+      },
+      {
+        "name": "e",
+        "frames": 23,
+        "manifest": "assets/sprites/c2/e/manifest.json"
+      },
+      {
+        "name": "h1",
+        "frames": 6,
+        "manifest": "assets/sprites/c2/h1/manifest.json"
+      },
+      {
+        "name": "h2",
+        "frames": 6,
+        "manifest": "assets/sprites/c2/h2/manifest.json"
+      },
+      {
+        "name": "h3",
+        "frames": 6,
+        "manifest": "assets/sprites/c2/h3/manifest.json"
+      },
+      {
+        "name": "h4",
+        "frames": 6,
+        "manifest": "assets/sprites/c2/h4/manifest.json"
+      },
+      {
+        "name": "h5",
+        "frames": 6,
+        "manifest": "assets/sprites/c2/h5/manifest.json"
+      },
+      {
+        "name": "h6",
+        "frames": 6,
+        "manifest": "assets/sprites/c2/h6/manifest.json"
+      },
+      {
+        "name": "h7",
+        "frames": 6,
+        "manifest": "assets/sprites/c2/h7/manifest.json"
+      },
+      {
+        "name": "w1",
+        "frames": 5,
+        "manifest": "assets/sprites/c2/w1/manifest.json"
+      },
+      {
+        "name": "w2",
+        "frames": 5,
+        "manifest": "assets/sprites/c2/w2/manifest.json"
+      },
+      {
+        "name": "w3",
+        "frames": 5,
+        "manifest": "assets/sprites/c2/w3/manifest.json"
+      },
+      {
+        "name": "w4",
+        "frames": 5,
+        "manifest": "assets/sprites/c2/w4/manifest.json"
+      },
+      {
+        "name": "w5",
+        "frames": 5,
+        "manifest": "assets/sprites/c2/w5/manifest.json"
+      }
+    ],
+    "c3": [
+      {
+        "name": "a1",
+        "frames": 15,
+        "manifest": "assets/sprites/c3/a1/manifest.json"
+      },
+      {
+        "name": "a2",
+        "frames": 15,
+        "manifest": "assets/sprites/c3/a2/manifest.json"
+      },
+      {
+        "name": "a3",
+        "frames": 15,
+        "manifest": "assets/sprites/c3/a3/manifest.json"
+      },
+      {
+        "name": "a4",
+        "frames": 15,
+        "manifest": "assets/sprites/c3/a4/manifest.json"
+      },
+      {
+        "name": "a5",
+        "frames": 15,
+        "manifest": "assets/sprites/c3/a5/manifest.json"
+      },
+      {
+        "name": "a6",
+        "frames": 15,
+        "manifest": "assets/sprites/c3/a6/manifest.json"
+      },
+      {
+        "name": "b",
+        "frames": 27,
+        "manifest": "assets/sprites/c3/b/manifest.json"
+      },
+      {
+        "name": "e",
+        "frames": 15,
+        "manifest": "assets/sprites/c3/e/manifest.json"
+      },
+      {
+        "name": "h1",
+        "frames": 6,
+        "manifest": "assets/sprites/c3/h1/manifest.json"
+      },
+      {
+        "name": "h2",
+        "frames": 6,
+        "manifest": "assets/sprites/c3/h2/manifest.json"
+      },
+      {
+        "name": "h3",
+        "frames": 6,
+        "manifest": "assets/sprites/c3/h3/manifest.json"
+      },
+      {
+        "name": "h4",
+        "frames": 6,
+        "manifest": "assets/sprites/c3/h4/manifest.json"
+      },
+      {
+        "name": "h5",
+        "frames": 6,
+        "manifest": "assets/sprites/c3/h5/manifest.json"
+      },
+      {
+        "name": "h6",
+        "frames": 6,
+        "manifest": "assets/sprites/c3/h6/manifest.json"
+      },
+      {
+        "name": "h7",
+        "frames": 6,
+        "manifest": "assets/sprites/c3/h7/manifest.json"
+      },
+      {
+        "name": "s1",
+        "frames": 2,
+        "manifest": "assets/sprites/c3/s1/manifest.json"
+      },
+      {
+        "name": "s2",
+        "frames": 2,
+        "manifest": "assets/sprites/c3/s2/manifest.json"
+      },
+      {
+        "name": "s3",
+        "frames": 2,
+        "manifest": "assets/sprites/c3/s3/manifest.json"
+      },
+      {
+        "name": "s5",
+        "frames": 2,
+        "manifest": "assets/sprites/c3/s5/manifest.json"
+      },
+      {
+        "name": "w1",
+        "frames": 5,
+        "manifest": "assets/sprites/c3/w1/manifest.json"
+      },
+      {
+        "name": "w2",
+        "frames": 5,
+        "manifest": "assets/sprites/c3/w2/manifest.json"
+      },
+      {
+        "name": "w3",
+        "frames": 5,
+        "manifest": "assets/sprites/c3/w3/manifest.json"
+      },
+      {
+        "name": "w4",
+        "frames": 5,
+        "manifest": "assets/sprites/c3/w4/manifest.json"
+      },
+      {
+        "name": "w5",
+        "frames": 5,
+        "manifest": "assets/sprites/c3/w5/manifest.json"
+      }
+    ],
+    "npc": [
+      {
+        "name": "00",
+        "frames": 9,
+        "manifest": "assets/sprites/npc/00/manifest.json"
+      },
+      {
+        "name": "01",
+        "frames": 3,
+        "manifest": "assets/sprites/npc/01/manifest.json"
+      },
+      {
+        "name": "02",
+        "frames": 3,
+        "manifest": "assets/sprites/npc/02/manifest.json"
+      },
+      {
+        "name": "04",
+        "frames": 8,
+        "manifest": "assets/sprites/npc/04/manifest.json"
+      },
+      {
+        "name": "05",
+        "frames": 6,
+        "manifest": "assets/sprites/npc/05/manifest.json"
+      },
+      {
+        "name": "07",
+        "frames": 2,
+        "manifest": "assets/sprites/npc/07/manifest.json"
+      },
+      {
+        "name": "08",
+        "frames": 2,
+        "manifest": "assets/sprites/npc/08/manifest.json"
+      },
+      {
+        "name": "09",
+        "frames": 6,
+        "manifest": "assets/sprites/npc/09/manifest.json"
+      },
+      {
+        "name": "10",
+        "frames": 6,
+        "manifest": "assets/sprites/npc/10/manifest.json"
+      },
+      {
+        "name": "11",
+        "frames": 6,
+        "manifest": "assets/sprites/npc/11/manifest.json"
+      },
+      {
+        "name": "12",
+        "frames": 6,
+        "manifest": "assets/sprites/npc/12/manifest.json"
+      },
+      {
+        "name": "13",
+        "frames": 6,
+        "manifest": "assets/sprites/npc/13/manifest.json"
+      },
+      {
+        "name": "14",
+        "frames": 2,
+        "manifest": "assets/sprites/npc/14/manifest.json"
+      },
+      {
+        "name": "15",
+        "frames": 18,
+        "manifest": "assets/sprites/npc/15/manifest.json"
+      },
+      {
+        "name": "16",
+        "frames": 13,
+        "manifest": "assets/sprites/npc/16/manifest.json"
+      },
+      {
+        "name": "17",
+        "frames": 18,
+        "manifest": "assets/sprites/npc/17/manifest.json"
+      },
+      {
+        "name": "all",
+        "frames": 32,
+        "manifest": "assets/sprites/npc/all/manifest.json"
+      }
+    ],
+    "img": [
+      {
+        "name": "atteff1",
+        "frames": 3,
+        "manifest": "assets/sprites/img/atteff1/manifest.json"
+      },
+      {
+        "name": "atteff2",
+        "frames": 3,
+        "manifest": "assets/sprites/img/atteff2/manifest.json"
+      },
+      {
+        "name": "atteff3",
+        "frames": 3,
+        "manifest": "assets/sprites/img/atteff3/manifest.json"
+      },
+      {
+        "name": "emoti",
+        "frames": 12,
+        "manifest": "assets/sprites/img/emoti/manifest.json"
+      },
+      {
+        "name": "end",
+        "frames": 3,
+        "manifest": "assets/sprites/img/end/manifest.json"
+      },
+      {
+        "name": "etcui",
+        "frames": 12,
+        "manifest": "assets/sprites/img/etcui/manifest.json"
+      },
+      {
+        "name": "glb",
+        "frames": 17,
+        "manifest": "assets/sprites/img/glb/manifest.json"
+      },
+      {
+        "name": "icoitm",
+        "frames": 23,
+        "manifest": "assets/sprites/img/icoitm/manifest.json"
+      },
+      {
+        "name": "keepst",
+        "frames": 9,
+        "manifest": "assets/sprites/img/keepst/manifest.json"
+      },
+      {
+        "name": "logo",
+        "frames": 5,
+        "manifest": "assets/sprites/img/logo/manifest.json"
+      },
+      {
+        "name": "title1",
+        "frames": 5,
+        "manifest": "assets/sprites/img/title1/manifest.json"
+      },
+      {
+        "name": "title2",
+        "frames": 5,
+        "manifest": "assets/sprites/img/title2/manifest.json"
+      },
+      {
+        "name": "uifrm",
+        "frames": 9,
+        "manifest": "assets/sprites/img/uifrm/manifest.json"
+      }
+    ],
+    "grd": [
+      {
+        "name": "0",
+        "frames": 2,
+        "manifest": "assets/sprites/grd/0/manifest.json"
+      },
+      {
+        "name": "1",
+        "frames": 2,
+        "manifest": "assets/sprites/grd/1/manifest.json"
+      },
+      {
+        "name": "2",
+        "frames": 2,
+        "manifest": "assets/sprites/grd/2/manifest.json"
+      },
+      {
+        "name": "3",
+        "frames": 2,
+        "manifest": "assets/sprites/grd/3/manifest.json"
+      },
+      {
+        "name": "4",
+        "frames": 2,
+        "manifest": "assets/sprites/grd/4/manifest.json"
+      },
+      {
+        "name": "5",
+        "frames": 2,
+        "manifest": "assets/sprites/grd/5/manifest.json"
+      },
+      {
+        "name": "fi",
+        "frames": 13,
+        "manifest": "assets/sprites/grd/fi/manifest.json"
+      },
+      {
+        "name": "gr",
+        "frames": 15,
+        "manifest": "assets/sprites/grd/gr/manifest.json"
+      },
+      {
+        "name": "grdico",
+        "frames": 30,
+        "manifest": "assets/sprites/grd/grdico/manifest.json"
+      },
+      {
+        "name": "wa",
+        "frames": 15,
+        "manifest": "assets/sprites/grd/wa/manifest.json"
+      }
+    ],
+    "char": [
+      {
+        "name": "lvup",
+        "frames": 6,
+        "manifest": "assets/sprites/char/lvup/manifest.json"
+      }
+    ],
+    "sgui": [
+      {
+        "name": "gmico",
+        "frames": 12,
+        "manifest": "assets/sprites/sgui/gmico/manifest.json"
+      },
+      {
+        "name": "shop",
+        "frames": 10,
+        "manifest": "assets/sprites/sgui/shop/manifest.json"
+      }
+    ],
+    "enm_die": [
+      {
+        "name": "bang",
+        "frames": 5,
+        "manifest": "assets/sprites/enm_die/bang/manifest.json"
+      }
+    ]
+  },
+  "maps": [
+    {
+      "name": "00",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/00.json"
+    },
+    {
+      "name": "01",
+      "width": 50,
+      "height": 40,
+      "file": "assets/maps/01.json"
+    },
+    {
+      "name": "02",
+      "width": 30,
+      "height": 50,
+      "file": "assets/maps/02.json"
+    },
+    {
+      "name": "03",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/03.json"
+    },
+    {
+      "name": "04",
+      "width": 30,
+      "height": 40,
+      "file": "assets/maps/04.json"
+    },
+    {
+      "name": "05",
+      "width": 17,
+      "height": 17,
+      "file": "assets/maps/05.json"
+    },
+    {
+      "name": "06",
+      "width": 17,
+      "height": 18,
+      "file": "assets/maps/06.json"
+    },
+    {
+      "name": "07",
+      "width": 17,
+      "height": 17,
+      "file": "assets/maps/07.json"
+    },
+    {
+      "name": "08",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/08.json"
+    },
+    {
+      "name": "09",
+      "width": 25,
+      "height": 24,
+      "file": "assets/maps/09.json"
+    },
+    {
+      "name": "10",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/10.json"
+    },
+    {
+      "name": "11",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/11.json"
+    },
+    {
+      "name": "12",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/12.json"
+    },
+    {
+      "name": "13",
+      "width": 21,
+      "height": 20,
+      "file": "assets/maps/13.json"
+    },
+    {
+      "name": "14",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/14.json"
+    },
+    {
+      "name": "15",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/15.json"
+    },
+    {
+      "name": "17",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/17.json"
+    },
+    {
+      "name": "18",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/18.json"
+    },
+    {
+      "name": "19",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/19.json"
+    },
+    {
+      "name": "20",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/20.json"
+    },
+    {
+      "name": "21",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/21.json"
+    },
+    {
+      "name": "22",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/22.json"
+    },
+    {
+      "name": "23",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/23.json"
+    },
+    {
+      "name": "24",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/24.json"
+    },
+    {
+      "name": "25",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/25.json"
+    },
+    {
+      "name": "27",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/27.json"
+    },
+    {
+      "name": "28",
+      "width": 50,
+      "height": 20,
+      "file": "assets/maps/28.json"
+    },
+    {
+      "name": "29",
+      "width": 20,
+      "height": 30,
+      "file": "assets/maps/29.json"
+    },
+    {
+      "name": "30",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/30.json"
+    },
+    {
+      "name": "31",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/31.json"
+    },
+    {
+      "name": "32",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/32.json"
+    },
+    {
+      "name": "33",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/33.json"
+    },
+    {
+      "name": "34",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/34.json"
+    },
+    {
+      "name": "35",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/35.json"
+    },
+    {
+      "name": "36",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/36.json"
+    },
+    {
+      "name": "37",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/37.json"
+    },
+    {
+      "name": "38",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/38.json"
+    },
+    {
+      "name": "39",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/39.json"
+    },
+    {
+      "name": "40",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/40.json"
+    },
+    {
+      "name": "41",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/41.json"
+    },
+    {
+      "name": "42",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/42.json"
+    },
+    {
+      "name": "43",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/43.json"
+    },
+    {
+      "name": "44",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/44.json"
+    },
+    {
+      "name": "45",
+      "width": 30,
+      "height": 40,
+      "file": "assets/maps/45.json"
+    },
+    {
+      "name": "46",
+      "width": 20,
+      "height": 80,
+      "file": "assets/maps/46.json"
+    },
+    {
+      "name": "47",
+      "width": 20,
+      "height": 80,
+      "file": "assets/maps/47.json"
+    },
+    {
+      "name": "48",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/48.json"
+    },
+    {
+      "name": "49",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/49.json"
+    },
+    {
+      "name": "50",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/50.json"
+    },
+    {
+      "name": "51",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/51.json"
+    },
+    {
+      "name": "52",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/52.json"
+    },
+    {
+      "name": "53",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/53.json"
+    },
+    {
+      "name": "54",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/54.json"
+    },
+    {
+      "name": "55",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/55.json"
+    },
+    {
+      "name": "56",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/56.json"
+    },
+    {
+      "name": "57",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/57.json"
+    },
+    {
+      "name": "58",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/58.json"
+    },
+    {
+      "name": "59",
+      "width": 30,
+      "height": 30,
+      "file": "assets/maps/59.json"
+    },
+    {
+      "name": "60",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/60.json"
+    },
+    {
+      "name": "61",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/61.json"
+    },
+    {
+      "name": "62",
+      "width": 40,
+      "height": 40,
+      "file": "assets/maps/62.json"
+    },
+    {
+      "name": "63",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/63.json"
+    },
+    {
+      "name": "64",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/64.json"
+    },
+    {
+      "name": "65",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/65.json"
+    },
+    {
+      "name": "66",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/66.json"
+    },
+    {
+      "name": "67",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/67.json"
+    },
+    {
+      "name": "68",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/68.json"
+    },
+    {
+      "name": "69",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/69.json"
+    },
+    {
+      "name": "70",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/70.json"
+    },
+    {
+      "name": "71",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/71.json"
+    },
+    {
+      "name": "72",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/72.json"
+    },
+    {
+      "name": "73",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/73.json"
+    },
+    {
+      "name": "74",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/74.json"
+    },
+    {
+      "name": "75",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/75.json"
+    },
+    {
+      "name": "76",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/76.json"
+    },
+    {
+      "name": "77",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/77.json"
+    },
+    {
+      "name": "78",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/78.json"
+    },
+    {
+      "name": "79",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/79.json"
+    },
+    {
+      "name": "80",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/80.json"
+    },
+    {
+      "name": "81",
+      "width": 20,
+      "height": 20,
+      "file": "assets/maps/81.json"
+    },
+    {
+      "name": "82",
+      "width": 15,
+      "height": 20,
+      "file": "assets/maps/82.json"
+    }
+  ],
+  "tdf_files": [
+    {
+      "name": "hero",
+      "entries": 24,
+      "file": "assets/tdf/char/hero.json"
+    },
+    {
+      "name": "grd",
+      "entries": 15,
+      "file": "assets/tdf/grd/grd.json"
+    },
+    {
+      "name": "grdsk",
+      "entries": 48,
+      "file": "assets/tdf/grd/grdsk.json"
+    },
+    {
+      "name": "itmatt",
+      "entries": 9,
+      "file": "assets/tdf/itm/itmatt.json"
+    },
+    {
+      "name": "itmtp",
+      "entries": 24,
+      "file": "assets/tdf/itm/itmtp.json"
+    },
+    {
+      "name": "name",
+      "entries": 86,
+      "file": "assets/tdf/m/name.json"
+    },
+    {
+      "name": "blak",
+      "entries": 34,
+      "file": "assets/tdf/sgui/blak.json"
+    },
+    {
+      "name": "com",
+      "entries": 82,
+      "file": "assets/tdf/sgui/com.json"
+    },
+    {
+      "name": "ed6",
+      "entries": 37,
+      "file": "assets/tdf/sgui/ed6.json"
+    },
+    {
+      "name": "ed7",
+      "entries": 22,
+      "file": "assets/tdf/sgui/ed7.json"
+    },
+    {
+      "name": "ed8",
+      "entries": 33,
+      "file": "assets/tdf/sgui/ed8.json"
+    },
+    {
+      "name": "edsr",
+      "entries": 62,
+      "file": "assets/tdf/sgui/edsr.json"
+    },
+    {
+      "name": "gm",
+      "entries": 67,
+      "file": "assets/tdf/sgui/gm.json"
+    },
+    {
+      "name": "help",
+      "entries": 13,
+      "file": "assets/tdf/sgui/help.json"
+    },
+    {
+      "name": "q6",
+      "entries": 105,
+      "file": "assets/tdf/sgui/q6.json"
+    },
+    {
+      "name": "q7",
+      "entries": 105,
+      "file": "assets/tdf/sgui/q7.json"
+    },
+    {
+      "name": "q8",
+      "entries": 105,
+      "file": "assets/tdf/sgui/q8.json"
+    },
+    {
+      "name": "refi",
+      "entries": 34,
+      "file": "assets/tdf/sgui/refi.json"
+    },
+    {
+      "name": "shop",
+      "entries": 27,
+      "file": "assets/tdf/sgui/shop.json"
+    }
+  ],
+  "fonts": [
+    {
+      "name": "big",
+      "char_count": 70,
+      "image": "assets/fonts/big.png",
+      "mapping": "assets/fonts/big.json"
+    },
+    {
+      "name": "small",
+      "char_count": 96,
+      "image": "assets/fonts/small.png",
+      "mapping": "assets/fonts/small.json"
+    }
+  ]
+}

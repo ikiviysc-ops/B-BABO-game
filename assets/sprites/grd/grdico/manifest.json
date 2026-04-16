@@ -1,0 +1,248 @@
+{
+  "source_mph": "grdico.mph",
+  "source_mpd": "grdico_0.mpd",
+  "mode": "basic",
+  "frame_count": 30,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "grdico_0.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "grdico_1.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "grdico_2.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "grdico_3.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "grdico_4.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "grdico_5.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "grdico_6.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "grdico_7.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "grdico_8.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 9,
+      "part_no": 0,
+      "file": "grdico_9.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 10,
+      "part_no": 0,
+      "file": "grdico_10.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 11,
+      "part_no": 0,
+      "file": "grdico_11.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 12,
+      "part_no": 0,
+      "file": "grdico_12.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 13,
+      "part_no": 0,
+      "file": "grdico_13.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 14,
+      "part_no": 0,
+      "file": "grdico_14.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 15,
+      "part_no": 0,
+      "file": "grdico_15.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 16,
+      "part_no": 0,
+      "file": "grdico_16.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 17,
+      "part_no": 0,
+      "file": "grdico_17.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 18,
+      "part_no": 0,
+      "file": "grdico_18.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 19,
+      "part_no": 0,
+      "file": "grdico_19.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 20,
+      "part_no": 0,
+      "file": "grdico_20.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 21,
+      "part_no": 0,
+      "file": "grdico_21.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 22,
+      "part_no": 0,
+      "file": "grdico_22.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 23,
+      "part_no": 0,
+      "file": "grdico_23.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 24,
+      "part_no": 0,
+      "file": "grdico_24.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 25,
+      "part_no": 0,
+      "file": "grdico_25.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 26,
+      "part_no": 0,
+      "file": "grdico_26.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 27,
+      "part_no": 0,
+      "file": "grdico_27.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 28,
+      "part_no": 0,
+      "file": "grdico_28.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 29,
+      "part_no": 0,
+      "file": "grdico_29.png",
+      "width": 15,
+      "height": 15,
+      "tag_flags": 152
+    }
+  ]
+}

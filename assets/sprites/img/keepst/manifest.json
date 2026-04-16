@@ -1,0 +1,80 @@
+{
+  "source_mph": "keepst.mph",
+  "source_mpd": "keepst_0.mpd",
+  "mode": "advance",
+  "frame_count": 9,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "keepst_0.png",
+      "width": 11,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "keepst_1.png",
+      "width": 5,
+      "height": 6,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "keepst_2.png",
+      "width": 7,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "keepst_3.png",
+      "width": 7,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "keepst_4.png",
+      "width": 5,
+      "height": 8,
+      "tag_flags": 152
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "keepst_5.png",
+      "width": 7,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "keepst_6.png",
+      "width": 7,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "keepst_7.png",
+      "width": 7,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "keepst_8.png",
+      "width": 7,
+      "height": 7,
+      "tag_flags": 152
+    }
+  ]
+}

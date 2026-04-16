@@ -1,0 +1,40 @@
+{
+  "source_mph": "15.mph",
+  "source_mpd": "15_0.mpd",
+  "mode": "basic",
+  "frame_count": 4,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "15_0.png",
+      "width": 20,
+      "height": 20,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "15_1.png",
+      "width": 20,
+      "height": 21,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "15_2.png",
+      "width": 18,
+      "height": 21,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "15_3.png",
+      "width": 18,
+      "height": 20,
+      "tag_flags": 152
+    }
+  ]
+}

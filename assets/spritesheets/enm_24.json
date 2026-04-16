@@ -1,0 +1,47 @@
+{
+  "pack": "enm_24",
+  "category": "enm",
+  "source_pack": "24",
+  "frame_count": 4,
+  "sheet_width": 120,
+  "sheet_height": 30,
+  "scale": 2,
+  "frames": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 30,
+      "height": 30
+    },
+    {
+      "x": 30,
+      "y": 0,
+      "width": 30,
+      "height": 30
+    },
+    {
+      "x": 60,
+      "y": 0,
+      "width": 30,
+      "height": 30
+    },
+    {
+      "x": 90,
+      "y": 0,
+      "width": 30,
+      "height": 30
+    }
+  ],
+  "animations": {
+    "walk": {
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameRate": 6,
+      "repeat": -1
+    }
+  }
+}

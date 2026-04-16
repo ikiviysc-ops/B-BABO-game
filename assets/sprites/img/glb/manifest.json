@@ -1,0 +1,144 @@
+{
+  "source_mph": "glb.mph",
+  "source_mpd": "glb_0.mpd",
+  "mode": "advance",
+  "frame_count": 17,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "glb_0.png",
+      "width": 7,
+      "height": 5,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "glb_1.png",
+      "width": 7,
+      "height": 5,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "glb_2.png",
+      "width": 5,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "glb_3.png",
+      "width": 5,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "glb_4.png",
+      "width": 106,
+      "height": 7,
+      "tag_flags": 136
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "glb_5.png",
+      "width": 50,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "glb_6.png",
+      "width": 11,
+      "height": 16,
+      "tag_flags": 152
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "glb_7.png",
+      "width": 7,
+      "height": 6,
+      "tag_flags": 152
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "glb_8.png",
+      "width": 9,
+      "height": 9,
+      "tag_flags": 152
+    },
+    {
+      "index": 9,
+      "part_no": 0,
+      "file": "glb_9.png",
+      "width": 19,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 10,
+      "part_no": 0,
+      "file": "glb_10.png",
+      "width": 13,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 11,
+      "part_no": 0,
+      "file": "glb_11.png",
+      "width": 13,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 12,
+      "part_no": 0,
+      "file": "glb_12.png",
+      "width": 25,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 13,
+      "part_no": 0,
+      "file": "glb_13.png",
+      "width": 15,
+      "height": 5,
+      "tag_flags": 152
+    },
+    {
+      "index": 14,
+      "part_no": 0,
+      "file": "glb_14.png",
+      "width": 7,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 15,
+      "part_no": 0,
+      "file": "glb_15.png",
+      "width": 13,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 16,
+      "part_no": 0,
+      "file": "glb_16.png",
+      "width": 17,
+      "height": 17,
+      "tag_flags": 152
+    }
+  ]
+}

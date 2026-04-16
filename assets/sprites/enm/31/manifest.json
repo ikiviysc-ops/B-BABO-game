@@ -1,0 +1,72 @@
+{
+  "source_mph": "31.mph",
+  "source_mpd": "31_0.mpd",
+  "mode": "basic",
+  "frame_count": 8,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "31_0.png",
+      "width": 23,
+      "height": 15,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "31_1.png",
+      "width": 27,
+      "height": 24,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "31_2.png",
+      "width": 26,
+      "height": 28,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "31_3.png",
+      "width": 28,
+      "height": 28,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "31_4.png",
+      "width": 28,
+      "height": 27,
+      "tag_flags": 152
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "31_5.png",
+      "width": 28,
+      "height": 27,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "31_6.png",
+      "width": 28,
+      "height": 26,
+      "tag_flags": 152
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "31_7.png",
+      "width": 22,
+      "height": 21,
+      "tag_flags": 152
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "source_mph": "gmico.mph",
+  "source_mpd": "gmico_0.mpd",
+  "mode": "advance",
+  "frame_count": 12,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "gmico_0.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "gmico_1.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "gmico_2.png",
+      "width": 13,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "gmico_3.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "gmico_4.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "gmico_5.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "gmico_6.png",
+      "width": 12,
+      "height": 13,
+      "tag_flags": 136
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "gmico_7.png",
+      "width": 10,
+      "height": 10,
+      "tag_flags": 152
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "gmico_8.png",
+      "width": 8,
+      "height": 11,
+      "tag_flags": 152
+    },
+    {
+      "index": 9,
+      "part_no": 0,
+      "file": "gmico_9.png",
+      "width": 10,
+      "height": 11,
+      "tag_flags": 152
+    },
+    {
+      "index": 10,
+      "part_no": 0,
+      "file": "gmico_10.png",
+      "width": 9,
+      "height": 11,
+      "tag_flags": 152
+    },
+    {
+      "index": 11,
+      "part_no": 0,
+      "file": "gmico_11.png",
+      "width": 10,
+      "height": 12,
+      "tag_flags": 152
+    }
+  ]
+}

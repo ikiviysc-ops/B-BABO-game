@@ -1,0 +1,48 @@
+{
+  "source_mph": "title2.mph",
+  "source_mpd": "title2_0.mpd",
+  "mode": "advance",
+  "frame_count": 5,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "title2_0.png",
+      "width": 17,
+      "height": 27,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "title2_1.png",
+      "width": 24,
+      "height": 26,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "title2_2.png",
+      "width": 26,
+      "height": 16,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "title2_3.png",
+      "width": 29,
+      "height": 14,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "title2_4.png",
+      "width": 24,
+      "height": 21,
+      "tag_flags": 152
+    }
+  ]
+}

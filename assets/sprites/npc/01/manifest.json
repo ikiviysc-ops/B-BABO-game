@@ -1,0 +1,32 @@
+{
+  "source_mph": "01.mph",
+  "source_mpd": "01_0.mpd",
+  "mode": "advance",
+  "frame_count": 3,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "01_0.png",
+      "width": 14,
+      "height": 26,
+      "tag_flags": 8344
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "01_1.png",
+      "width": 13,
+      "height": 26,
+      "tag_flags": 8344
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "01_2.png",
+      "width": 13,
+      "height": 26,
+      "tag_flags": 8344
+    }
+  ]
+}

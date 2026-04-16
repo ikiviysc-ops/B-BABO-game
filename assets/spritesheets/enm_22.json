@@ -1,0 +1,80 @@
+{
+  "pack": "enm_22",
+  "category": "enm",
+  "source_pack": "22",
+  "frame_count": 7,
+  "sheet_width": 496,
+  "sheet_height": 102,
+  "scale": 2,
+  "frames": [
+    {
+      "x": 0,
+      "y": 3,
+      "width": 60,
+      "height": 96
+    },
+    {
+      "x": 60,
+      "y": 1,
+      "width": 60,
+      "height": 100
+    },
+    {
+      "x": 120,
+      "y": 6,
+      "width": 74,
+      "height": 90
+    },
+    {
+      "x": 194,
+      "y": 0,
+      "width": 74,
+      "height": 102
+    },
+    {
+      "x": 268,
+      "y": 0,
+      "width": 86,
+      "height": 102
+    },
+    {
+      "x": 354,
+      "y": 26,
+      "width": 76,
+      "height": 50
+    },
+    {
+      "x": 430,
+      "y": 32,
+      "width": 66,
+      "height": 38
+    }
+  ],
+  "animations": {
+    "walk": {
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameRate": 6,
+      "repeat": -1
+    },
+    "attack": {
+      "frames": [
+        4,
+        5
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    "hurt": {
+      "frames": [
+        6
+      ],
+      "frameRate": 4,
+      "repeat": 0
+    }
+  }
+}

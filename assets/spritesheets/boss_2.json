@@ -1,0 +1,155 @@
+{
+  "pack": "boss_2",
+  "category": "boss",
+  "source_pack": "2",
+  "frame_count": 17,
+  "sheet_width": 1144,
+  "sheet_height": 200,
+  "scale": 2,
+  "frames": [
+    {
+      "x": 0,
+      "y": 65,
+      "width": 54,
+      "height": 70
+    },
+    {
+      "x": 54,
+      "y": 66,
+      "width": 48,
+      "height": 68
+    },
+    {
+      "x": 102,
+      "y": 88,
+      "width": 30,
+      "height": 24
+    },
+    {
+      "x": 132,
+      "y": 68,
+      "width": 70,
+      "height": 64
+    },
+    {
+      "x": 202,
+      "y": 77,
+      "width": 18,
+      "height": 46
+    },
+    {
+      "x": 220,
+      "y": 77,
+      "width": 18,
+      "height": 46
+    },
+    {
+      "x": 238,
+      "y": 0,
+      "width": 100,
+      "height": 200
+    },
+    {
+      "x": 338,
+      "y": 33,
+      "width": 94,
+      "height": 134
+    },
+    {
+      "x": 432,
+      "y": 38,
+      "width": 38,
+      "height": 124
+    },
+    {
+      "x": 470,
+      "y": 49,
+      "width": 88,
+      "height": 102
+    },
+    {
+      "x": 558,
+      "y": 15,
+      "width": 102,
+      "height": 170
+    },
+    {
+      "x": 660,
+      "y": 66,
+      "width": 60,
+      "height": 68
+    },
+    {
+      "x": 720,
+      "y": 66,
+      "width": 62,
+      "height": 68
+    },
+    {
+      "x": 782,
+      "y": 53,
+      "width": 86,
+      "height": 94
+    },
+    {
+      "x": 868,
+      "y": 51,
+      "width": 88,
+      "height": 98
+    },
+    {
+      "x": 956,
+      "y": 17,
+      "width": 94,
+      "height": 166
+    },
+    {
+      "x": 1050,
+      "y": 18,
+      "width": 94,
+      "height": 164
+    }
+  ],
+  "animations": {
+    "walk": {
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameRate": 6,
+      "repeat": -1
+    },
+    "attack": {
+      "frames": [
+        4,
+        5
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    "hurt": {
+      "frames": [
+        6
+      ],
+      "frameRate": 4,
+      "repeat": 0
+    },
+    "death": {
+      "frames": [
+        7
+      ],
+      "frameRate": 4,
+      "repeat": 0
+    },
+    "idle": {
+      "frames": [
+        0,
+        1
+      ],
+      "frameRate": 3,
+      "repeat": -1
+    }
+  }
+}

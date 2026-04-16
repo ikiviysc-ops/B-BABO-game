@@ -1,0 +1,128 @@
+{
+  "source_mph": "a4.mph",
+  "source_mpd": "a4_0.mpd",
+  "mode": "advance",
+  "frame_count": 15,
+  "frames": [
+    {
+      "index": 0,
+      "part_no": 0,
+      "file": "a4_0.png",
+      "width": 4,
+      "height": 5,
+      "tag_flags": 152
+    },
+    {
+      "index": 1,
+      "part_no": 0,
+      "file": "a4_1.png",
+      "width": 3,
+      "height": 6,
+      "tag_flags": 152
+    },
+    {
+      "index": 2,
+      "part_no": 0,
+      "file": "a4_2.png",
+      "width": 2,
+      "height": 5,
+      "tag_flags": 152
+    },
+    {
+      "index": 3,
+      "part_no": 0,
+      "file": "a4_3.png",
+      "width": 4,
+      "height": 4,
+      "tag_flags": 152
+    },
+    {
+      "index": 4,
+      "part_no": 0,
+      "file": "a4_4.png",
+      "width": 6,
+      "height": 8,
+      "tag_flags": 152
+    },
+    {
+      "index": 5,
+      "part_no": 0,
+      "file": "a4_5.png",
+      "width": 6,
+      "height": 8,
+      "tag_flags": 152
+    },
+    {
+      "index": 6,
+      "part_no": 0,
+      "file": "a4_6.png",
+      "width": 6,
+      "height": 8,
+      "tag_flags": 152
+    },
+    {
+      "index": 7,
+      "part_no": 0,
+      "file": "a4_7.png",
+      "width": 6,
+      "height": 8,
+      "tag_flags": 152
+    },
+    {
+      "index": 8,
+      "part_no": 0,
+      "file": "a4_8.png",
+      "width": 5,
+      "height": 5,
+      "tag_flags": 152
+    },
+    {
+      "index": 9,
+      "part_no": 0,
+      "file": "a4_9.png",
+      "width": 6,
+      "height": 6,
+      "tag_flags": 152
+    },
+    {
+      "index": 10,
+      "part_no": 0,
+      "file": "a4_10.png",
+      "width": 6,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 11,
+      "part_no": 0,
+      "file": "a4_11.png",
+      "width": 6,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 12,
+      "part_no": 0,
+      "file": "a4_12.png",
+      "width": 6,
+      "height": 6,
+      "tag_flags": 152
+    },
+    {
+      "index": 13,
+      "part_no": 0,
+      "file": "a4_13.png",
+      "width": 8,
+      "height": 7,
+      "tag_flags": 152
+    },
+    {
+      "index": 14,
+      "part_no": 0,
+      "file": "a4_14.png",
+      "width": 7,
+      "height": 7,
+      "tag_flags": 152
+    }
+  ]
+}

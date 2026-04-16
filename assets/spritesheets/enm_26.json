@@ -1,0 +1,67 @@
+{
+  "pack": "enm_26",
+  "category": "enm",
+  "source_pack": "26",
+  "frame_count": 6,
+  "sheet_width": 218,
+  "sheet_height": 42,
+  "scale": 2,
+  "frames": [
+    {
+      "x": 0,
+      "y": 1,
+      "width": 34,
+      "height": 40
+    },
+    {
+      "x": 34,
+      "y": 2,
+      "width": 40,
+      "height": 38
+    },
+    {
+      "x": 74,
+      "y": 0,
+      "width": 34,
+      "height": 42
+    },
+    {
+      "x": 108,
+      "y": 1,
+      "width": 34,
+      "height": 40
+    },
+    {
+      "x": 142,
+      "y": 3,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "x": 182,
+      "y": 2,
+      "width": 36,
+      "height": 38
+    }
+  ],
+  "animations": {
+    "walk": {
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameRate": 6,
+      "repeat": -1
+    },
+    "attack": {
+      "frames": [
+        4,
+        5
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    }
+  }
+}

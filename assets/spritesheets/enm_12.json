@@ -1,0 +1,137 @@
+{
+  "pack": "enm_12",
+  "category": "enm",
+  "source_pack": "12",
+  "frame_count": 14,
+  "sheet_width": 554,
+  "sheet_height": 60,
+  "scale": 2,
+  "frames": [
+    {
+      "x": 0,
+      "y": 1,
+      "width": 34,
+      "height": 58
+    },
+    {
+      "x": 34,
+      "y": 1,
+      "width": 46,
+      "height": 58
+    },
+    {
+      "x": 80,
+      "y": 1,
+      "width": 42,
+      "height": 58
+    },
+    {
+      "x": 122,
+      "y": 2,
+      "width": 46,
+      "height": 56
+    },
+    {
+      "x": 168,
+      "y": 8,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "x": 212,
+      "y": 24,
+      "width": 44,
+      "height": 12
+    },
+    {
+      "x": 256,
+      "y": 8,
+      "width": 34,
+      "height": 44
+    },
+    {
+      "x": 290,
+      "y": 25,
+      "width": 34,
+      "height": 10
+    },
+    {
+      "x": 324,
+      "y": 3,
+      "width": 40,
+      "height": 54
+    },
+    {
+      "x": 364,
+      "y": 2,
+      "width": 46,
+      "height": 56
+    },
+    {
+      "x": 410,
+      "y": 0,
+      "width": 46,
+      "height": 60
+    },
+    {
+      "x": 456,
+      "y": 3,
+      "width": 40,
+      "height": 54
+    },
+    {
+      "x": 496,
+      "y": 2,
+      "width": 32,
+      "height": 56
+    },
+    {
+      "x": 528,
+      "y": 2,
+      "width": 26,
+      "height": 56
+    }
+  ],
+  "animations": {
+    "walk": {
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameRate": 6,
+      "repeat": -1
+    },
+    "attack": {
+      "frames": [
+        4,
+        5
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    "hurt": {
+      "frames": [
+        6
+      ],
+      "frameRate": 4,
+      "repeat": 0
+    },
+    "death": {
+      "frames": [
+        7
+      ],
+      "frameRate": 4,
+      "repeat": 0
+    },
+    "idle": {
+      "frames": [
+        0,
+        1
+      ],
+      "frameRate": 3,
+      "repeat": -1
+    }
+  }
+}
