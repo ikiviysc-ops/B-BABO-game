@@ -392,6 +392,7 @@ export class Game {
 
     // === 升级选择状态 ===
     if (this.levelUpSystem.pendingLevelUp) {
+      this.levelUpPanel.show();
       this.handleLevelUpInput();
       return;
     }
@@ -587,6 +588,9 @@ export class Game {
     }
 
     console.log(`[B-BABO] Lv.${this.levelUpSystem.level} — 选择: ${option.name}`);
+
+    // 隐藏升级面板，恢复游戏
+    this.levelUpPanel.hide();
 
     // 升级粒子特效
     if (this._player) {
