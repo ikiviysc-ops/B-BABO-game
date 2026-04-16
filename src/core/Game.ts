@@ -567,6 +567,19 @@ export class Game {
       );
       if (idx >= 0) {
         this.applyLevelUpChoice(idx);
+        return;
+      }
+    }
+    // 备用：鼠标点击选择（兼容桌面浏览器调试）
+    if (this.input.mouseDown) {
+      const idx = this.levelUpPanel.hitTest(
+        this.input.mouseX, this.input.mouseY,
+        options, this.canvas.width, this.canvas.height,
+      );
+      if (idx >= 0) {
+        this.applyLevelUpChoice(idx);
+        this.input.consumeTap(); // 消费掉防止重复
+        return;
       }
     }
   }
