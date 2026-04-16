@@ -1,6 +1,7 @@
 // CharacterRegistry.ts - 20角色注册表
 
 import { CharacterPalette, CHARACTER_PALETTES, generateSprite } from './BaboSprite';
+import { getCharacterAccessories } from './characters/accessories/registry';
 
 export interface CharacterStats {
   hp: number;
@@ -232,6 +233,7 @@ export function renderCharacter(
 
   const pixelSize = scale;
 
+  // 渲染角色本身
   for (let row = 0; row < 32; row++) {
     for (let col = 0; col < 32; col++) {
       const color = sprite.pixels[row][col];
@@ -243,6 +245,29 @@ export function renderCharacter(
         pixelSize,
         pixelSize
       );
+    }
+  }
+
+  // 渲染角色配饰
+  const accessories = getCharacterAccessories(id);
+  if (accessories) {
+    for (const accessory of accessories.accessories) {
+      const accessoryX = x + accessory.offsetX * scale;
+      const accessoryY = y + accessory.offsetY * scale;
+      
+      for (let row = 0; row < 32; row++) {
+        for (let col = 0; col < 32; col++) {
+          const color = accessory.sprite[row][col];
+          if (color === 'transparent') continue;
+          ctx.fillStyle = color;
+          ctx.fillRect(
+            accessoryX + col * pixelSize,
+            accessoryY + row * pixelSize,
+            pixelSize,
+            pixelSize
+          );
+        }
+      }
     }
   }
 }
