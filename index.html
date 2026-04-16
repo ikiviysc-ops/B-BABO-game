@@ -27,18 +27,68 @@
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }
-    /* 暗角效果 - CSS实现，零性能开销 */
-    #game-canvas::after {
-      content: '';
+    /* 诊断面板 - 独立于游戏代码 */
+    #diag {
       position: fixed;
-      inset: 0;
+      top: 4px; right: 4px;
+      background: rgba(0,0,0,0.85);
+      color: #0f0;
+      font: 10px monospace;
+      padding: 6px 8px;
+      border: 1px solid #0f0;
+      z-index: 99999;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%);
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
   <canvas id="game-canvas"></canvas>
+  <div id="diag"></div>
+  <script>
+    // 独立诊断循环 - 不依赖游戏代码
+    const diag = document.getElementById('diag');
+    const canvas = document.getElementById('game-canvas');
+    let diagFrame = 0;
+    let diagLast = performance.now();
+    let diagFps = 0;
+    let diagErrors = [];
+
+    // 捕获所有未处理错误
+    window.addEventListener('error', (e) => {
+      diagErrors.push(e.message || String(e));
+      if (diagErrors.length > 5) diagErrors.shift();
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      diagErrors.push('Promise: ' + (e.reason?.message || String(e.reason)));
+      if (diagErrors.length > 5) diagErrors.shift();
+    });
+
+    function diagLoop(now) {
+      diagFrame++;
+      const dt = now - diagLast;
+      if (dt >= 1000) {
+        diagFps = Math.round(diagFrame * 1000 / dt);
+        diagFrame = 0;
+        diagLast = now;
+      }
+
+      // 检查canvas状态
+      const ctx = canvas.getContext('2d');
+      const canvasW = canvas.width;
+      const canvasH = canvas.height;
+      const compOp = ctx ? ctx.globalCompositeOperation : 'N/A';
+      const alpha = ctx ? ctx.globalAlpha : 'N/A';
+
+      let html = `DIAG FPS:${diagFps} | Canvas:${canvasW}x${canvasH} | comp:${compOp} α:${alpha}`;
+      if (diagErrors.length > 0) {
+        html += '<br><span style="color:#f44">ERR:' + diagErrors.join(' | ') + '</span>';
+      }
+      diag.innerHTML = html;
+      requestAnimationFrame(diagLoop);
+    }
+    requestAnimationFrame(diagLoop);
+  </script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
