@@ -123,7 +123,7 @@ export class WaveSystem {
     // 当前波次所有敌人已生成且全部击杀
     if (this.enemiesRemaining <= 0 && this.spawnQueue.length === 0) {
       // 检查是否还有下一波
-      if (this.waveNum >= WAVE_CONFIGS.length) {
+      if (this.waveNum > WAVE_CONFIGS.length) {
         this.allWavesComplete = true;
       } else {
         this.isResting = true;
