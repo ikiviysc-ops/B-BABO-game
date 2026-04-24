@@ -834,7 +834,12 @@ const DigEngine = {
       if(q==='leg'||q==='myt'){
         try{
           const u=new SpeechSynthesisUtterance(q==='leg'?'哇！金色传说！':'哇！红色神话！');
-          u.lang='zh-CN';u.rate=1.1;u.pitch=1.2;speechSynthesis.speak(u);
+          u.lang='zh-CN';u.rate=1.1;u.pitch=1.2;u.volume=1;
+          const voices=speechSynthesis.getVoices();
+          const zhVoice=voices.find(v=>v.lang.startsWith('zh'));
+          if(zhVoice)u.voice=zhVoice;
+          speechSynthesis.cancel();
+          speechSynthesis.speak(u);
         }catch(e){}
       }
       d.player.exp+=q==='civ'?1:q==='upg'?3:q==='rar'?8:q==='epi'?20:q==='leg'?50:100;
@@ -2597,6 +2602,9 @@ detail.style.display='block';const isLeft=pos.x<50;detail.style.left=isLeft?(pos
 // ========== 初始化 ==========
 function init(){
   GameData.load();
+  // 解锁语音合成（移动端需要用户交互）
+  document.addEventListener('click',function unlockSpeech(){speechSynthesis.getVoices();document.removeEventListener('click',unlockSpeech);},{once:true});
+  document.addEventListener('touchstart',function unlockSpeech(){speechSynthesis.getVoices();document.removeEventListener('touchstart',unlockSpeech);},{once:true});
   // 离线体力恢复
   const d=GameData.data,now=Date.now(),last=d.staminaRecovery.lastRecoveryTime||now,elapsed=now-last;
   if(elapsed>=60000&&d.player.stamina<d.player.maxStamina){const pts=Math.min(Math.floor(elapsed/60000),d.player.maxStamina-d.player.stamina);d.player.stamina+=pts;d.staminaRecovery.lastRecoveryTime=now;GameData.save();}
