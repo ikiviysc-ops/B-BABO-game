@@ -1150,6 +1150,8 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
 .skill-item__name {
@@ -1161,6 +1163,7 @@ html, body {
 .skill-item__level {
   font-size: 11px;
   color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 .skill-item__btn {

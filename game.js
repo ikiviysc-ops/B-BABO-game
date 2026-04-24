@@ -690,12 +690,12 @@ const SKILLS = [
    effectDesc(lv){return '售价+'+Math.min(lv*0.1,200).toFixed(1)+'%';}}
 ];
 const QUALITY_CONFIG = {
-  civ:{label:'CIV',name:'普通',color:'#9CA3AF',weight:50,sfx:'reveal',order:0},
-  upg:{label:'UPG',name:'改良',color:'#4CAF50',weight:30,sfx:'reveal',order:1},
-  rar:{label:'RAR',name:'精良',color:'#3B82F6',weight:12,sfx:'rare',order:2},
-  epi:{label:'EPI',name:'史诗',color:'#8B5CF6',weight:5,sfx:'epic',order:3},
-  leg:{label:'LEG',name:'传说',color:'#FFD700',weight:2,sfx:'legend',order:4},
-  myt:{label:'MYT',name:'神话',color:'#EF4444',weight:1,sfx:'mythic',order:5}
+  civ:{label:'CIV',name:'普通',color:'#9CA3AF',weight:60,sfx:'reveal',order:0},
+  upg:{label:'UPG',name:'改良',color:'#4CAF50',weight:25,sfx:'reveal',order:1},
+  rar:{label:'RAR',name:'精良',color:'#3B82F6',weight:10,sfx:'rare',order:2},
+  epi:{label:'EPI',name:'史诗',color:'#8B5CF6',weight:3,sfx:'epic',order:3},
+  leg:{label:'LEG',name:'传说',color:'#FFD700',weight:1.2,sfx:'legend',order:4},
+  myt:{label:'MYT',name:'神话',color:'#EF4444',weight:0.3,sfx:'mythic',order:5}
 };
 const QUALITY_ORDER = ['civ','upg','rar','epi','leg','myt'];
 const EVENTS = [
@@ -831,11 +831,39 @@ const DigEngine = {
     if(item){
       GameData.data.digItems.push(item);
       SFX.play(QUALITY_CONFIG[q].sfx);
+      if(q==='leg'||q==='myt'){
+        try{
+          const u=new SpeechSynthesisUtterance(q==='leg'?'哇！金色传说！':'哇！红色神话！');
+          u.lang='zh-CN';u.rate=1.1;u.pitch=1.2;speechSynthesis.speak(u);
+        }catch(e){}
+      }
       d.player.exp+=q==='civ'?1:q==='upg'?3:q==='rar'?8:q==='epi'?20:q==='leg'?50:100;
       this.checkLevelUp();
       UI.updateDigBackpack();
       GameData.save();
       UI.updateStatusBar();
+      return{item};
+    }
+    return null;
+  },
+  // 静默挖掘（不刷新UI，用于十连）
+  _digCellSilent(){
+    const d=GameData.data;
+    if(d.player.stamina<1)return null;
+    const zone=ZONES[d.maps.currentMap];
+    const bpConf=DIG_BACKPACK_LEVELS[GameData.data.digBackpack.level-1]||DIG_BACKPACK_LEVELS[0];
+    let usedSlots=0;GameData.data.digItems.forEach(it=>{const s=UI._getItemSpan(it.size,it.category,it.icon);usedSlots+=s.w*s.h;});
+    if(usedSlots>=bpConf.slots)return null;
+    d.player.stamina=Math.max(0,d.player.stamina-1);
+    this.session.staminaUsed++;
+    const isEmpty=Math.random()<0.25;
+    if(isEmpty)return{isEmpty:true};
+    const q=randomQuality(zone.qualityRange);
+    const item=randomItem(q);
+    if(item){
+      GameData.data.digItems.push(item);
+      d.player.exp+=q==='civ'?1:q==='upg'?3:q==='rar'?8:q==='epi'?20:q==='leg'?50:100;
+      this.checkLevelUp();
       return{item};
     }
     return null;
@@ -849,16 +877,12 @@ const DigEngine = {
     this.resetSession();
     const cnt=Math.min(10,d.player.stamina);
     if(!cnt)return;
+    // 先收集所有物品，再一次性渲染
     for(let i=0;i<cnt;i++){
-      setTimeout(()=>{
-        this.digCell();
-        if(i===cnt-1){
-          setTimeout(()=>{
-            if(d.digItems.length>0)UI.showResultModal();
-          },500);
-        }
-      },i*150);
+      this._digCellSilent();
     }
+    UI.refreshScavenge();
+    if(d.digItems.length>0)UI.showResultModal();
   },
   checkLevelUp(){const d=GameData.data,need=d.player.level*100;while(d.player.exp>=need){d.player.exp-=need;d.player.level++;UI.showToast('🎉 升级到 Lv.'+d.player.level+'！');}},
   getProgress(){const t=document.querySelectorAll('.dig-cell').length,r=document.querySelectorAll('.dig-cell--revealed,.dig-cell--empty,.dig-cell--event').length;return{revealed:r,total:t,percent:t>0?Math.round(r/t*100):0};}
@@ -1341,22 +1365,22 @@ const MuseumEngine = {
     return true;
   },
 
-  // 模拟访客和收入（每分钟调用一次，仅在营业时生效）
-  // 每秒客流累积（用小数累积，每秒调用）
-  _visitorAccum: 0,
+  // 模拟访客和收入（每秒调用，随机波动进人）
+  _lastVisitorCount: 0,
   tickVisitors() {
     const d = GameData.data;
     const m = d.museum;
     if (!m.exhibits.length) return;
-    if (!m.isBizOpen) return;
+    if (!m.isBizOpen) { this._lastVisitorCount = 0; return; }
     const levelConf = this.LEVELS[m.level - 1];
     const scoreMult = 1 + this.calcScore() / 1000;
-    const ratePerHour = Math.max(1, (levelConf.baseVisitors + 1) * (m.ticketMult || 1) * scoreMult);
-    // 每秒累积（1小时=3600秒）
-    this._visitorAccum += ratePerHour / 3600;
-    if (this._visitorAccum >= 1) {
-      const visitors = Math.floor(this._visitorAccum);
-      this._visitorAccum -= visitors;
+    const baseRate = Math.max(1, (levelConf.baseVisitors + 1) * (m.ticketMult || 1) * scoreMult);
+    const perSecExpect = baseRate / 60;
+    const minPerSec = Math.max(0, perSecExpect * 0.3);
+    const maxPerSec = perSecExpect * 1.8;
+    const visitors = Math.random() < (perSecExpect / maxPerSec) ? randomInt(Math.max(1, Math.floor(minPerSec)), Math.max(1, Math.ceil(maxPerSec))) : 0;
+    this._lastVisitorCount = visitors;
+    if (visitors > 0) {
       const ticketIncome = visitors * (m.ticketPrice || 0);
       m.dailyVisitors += visitors;
       m.dailyIncome += ticketIncome;
@@ -2530,11 +2554,12 @@ detail.style.display='block';const isLeft=pos.x<50;detail.style.left=isLeft?(pos
     timeEl.textContent=used.toFixed(1)+'h/'+MuseumEngine.MAX_BIZ_HOURS+'h';
 
     if(m.isBizOpen){
-      btn.textContent='停止营业';
+      btn.textContent='⏹ 停止营业';
       btn.className='btn btn--danger btn--sm';
       btn.disabled=false;
     }else{
-      btn.textContent=left>0?'开始营业':'今日已满';
+      const ticketLabel='💰'+formatGold(m.ticketPrice||30);
+      btn.textContent=left>0?'▶ 开始营业 ('+ticketLabel+')':'今日已满';
       btn.className='btn btn--primary btn--sm';
       btn.disabled=left<=0;
     }
@@ -2547,8 +2572,8 @@ detail.style.display='block';const isLeft=pos.x<50;detail.style.left=isLeft?(pos
       const actualPrice=basePrice>0?Math.floor(basePrice*scoreMult):0;
       b.classList.toggle('active',actualPrice===(m.ticketPrice||30));
       // 更新按钮显示价格
-      const priceText=actualPrice>0?'💰'+formatGold(actualPrice):'免费';
-      const multText=basePrice===0?'客流×2':basePrice<=10?'较多':basePrice<=30?'推荐':basePrice<=80?'较少':'稀少';
+      const priceText='💰'+formatGold(actualPrice);
+      const multText=basePrice<=5?'客流×1.5':basePrice<=10?'较多':basePrice<=30?'推荐':basePrice<=80?'较少':'稀少';
       b.innerHTML=priceText+'<br><small>'+multText+'</small>';
       b.dataset.actualPrice=actualPrice;
     });
@@ -2564,9 +2589,7 @@ detail.style.display='block';const isLeft=pos.x<50;detail.style.left=isLeft?(pos
     if(sEl)sEl.textContent=MuseumEngine.calcScore()+' 分';
     // 客流速率预览
     if(rEl){
-      const rate=MuseumEngine.getVisitorRate();
-      const perSec=(rate/3600);
-      rEl.textContent=perSec>=1?perSec.toFixed(1)+' 人/s':perSec.toFixed(2)+' 人/s';
+      rEl.textContent=MuseumEngine._lastVisitorCount+' 人/秒';
     }
   },
 };
@@ -2785,8 +2808,12 @@ function init(){
     const body=document.getElementById('skillsBody');
     let html='<div class="skill-list">';
     SKILLS.forEach(s=>{
-      const lv=d.skills[s.key],cost=s.costBase*lv,maxed=lv>=s.maxLevel;
-      html+=`<div class="skill-item"><div class="skill-item__info"><span class="skill-item__name">${s.name}</span><span class="skill-item__level">Lv.${lv}/${s.maxLevel} · ${s.desc}</span></div><button class="btn btn--sm btn--primary skill-item__btn" data-skill="${s.key}" data-cost="${cost}" ${maxed||d.player.gold<cost?'disabled':''}>${maxed?'已满级':'💰'+formatGold(cost)}</button></div>`;
+      const lv=d.skills[s.key];
+      const cost=Math.floor(s.costBase*Math.pow(1.15,lv-1));
+      const maxed=lv>=s.maxLevel;
+      const effectText=s.effectDesc?s.effectDesc(lv):s.desc;
+      const nextEffectText=maxed?'已满级':s.effect?s.effect(lv+1):'';
+      html+=`<div class="skill-item"><div class="skill-item__info"><span class="skill-item__name">${s.icon||''} ${s.name}</span><span class="skill-item__level">Lv.${lv} · ${effectText}${!maxed?' → <small style="color:var(--color-success)">Lv.'+(lv+1)+' '+nextEffectText+'</small>':''}</span></div><button class="btn btn--sm btn--primary skill-item__btn" data-skill="${s.key}" data-cost="${cost}" ${maxed||d.player.gold<cost?'disabled':''}>${maxed?'已满级':'💰'+formatGold(cost)}</button></div>`;
     });
     html+='</div>';
     body.innerHTML=html;
